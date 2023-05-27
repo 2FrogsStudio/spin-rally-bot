@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  app:
+    image: ghcr.io/2frogsstudio/spin-rally-bot:${TAG:-latest}
+    env_file: .env
+    volumes:
+      - ./logs/:/app/logs/
+    restart: on-failure
