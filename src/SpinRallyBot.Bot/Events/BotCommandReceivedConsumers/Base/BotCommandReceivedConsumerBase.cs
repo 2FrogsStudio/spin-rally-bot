@@ -19,11 +19,11 @@ public abstract class BotCommandReceivedConsumerBase : IConsumer<BotCommandRecei
         var message = context.Message.Message;
         var cancellationToken = context.CancellationToken;
 
-        if (message is not { Chat.Id: var chatId, MessageThreadId: var messageThreadId, From.Id: var fromId }) {
+        if (message is not { Chat: { Id: var chatId, Type: var chatType }, MessageThreadId: var messageThreadId, From.Id: var fromId }) {
             return;
         }
 
-        var isAdmin = chatId == fromId || await IsChatAdmin(chatId, fromId, cancellationToken);
+        var isAdmin = chatType == ChatType.Private || await IsChatAdmin(chatId, fromId, cancellationToken);
 
         // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
         var replyText = await ConsumeAndGetReply(context.Message.Arguments, context.Message.Message, chatId, messageThreadId ?? 0, isAdmin,

@@ -8,5 +8,6 @@ public class CommandAttribute : Attribute {
 
     public string Text { get; }
     public string? Description { get; init; }
-    public bool IsBotInitCommand { get; init; }
+    public bool IsInitCommand { get; init; } = true;
+    public bool IsInlineCommand { get; init; } = true;
 }

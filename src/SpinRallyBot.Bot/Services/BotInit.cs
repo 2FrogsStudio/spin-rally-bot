@@ -22,7 +22,7 @@ internal class BotInit : IHostedService {
 
     private async Task InitCommands(CancellationToken cancellationToken) {
         var commands = CommandHelpers.CommandAttributeByCommand.Values
-            .Where(d => d is { IsBotInitCommand: true })
+            .Where(d => d is { IsInitCommand: true })
             .Select(d => new BotCommand {
                 Command = d!.Text,
                 Description = d.Description ?? string.Empty

@@ -7,6 +7,11 @@ public enum Command {
 
     [Command("/help",
         Description = "Show this help",
-        IsBotInitCommand = true)]
-    Help
+        IsInitCommand = true)]
+    Help,
+    
+    [Command("/start",
+        Description = "Start Spin Rally Bot",
+        IsInlineCommand = false)]
+    Start
 }
