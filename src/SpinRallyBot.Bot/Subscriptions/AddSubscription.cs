@@ -43,7 +43,7 @@ public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
             return;
         }
 
-        entity ??= new Subscription {
+        entity ??= new SubscriptionEntity {
             ChatId = chatId,
             Fio = player.Fio,
             PlayerUrl = player.PlayerUrl

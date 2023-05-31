@@ -5,10 +5,10 @@ using Telegram.Bot.Extensions.Markup;
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
 public class HelpCommandReceivedConsumer : CommandReceivedConsumerBase {
-    public HelpCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache) :
-        base(Command.Help, botClient, memoryCache) { }
+    public HelpCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache, IScopedMediator mediator) :
+        base(Command.Help, botClient, memoryCache, mediator) { }
 
-    protected override Task<string?> ConsumeAndGetReply(long chatId, string[] args,
+    protected override Task ConsumeAndGetReply(long userId, long chatId, string[] args,
         CancellationToken cancellationToken) {
         var text = "Usage:\n" +
                    string.Join('\n', CommandHelpers.CommandAttributeByCommand
@@ -16,6 +16,7 @@ public class HelpCommandReceivedConsumer : CommandReceivedConsumerBase {
                        .Select(c => c.Value!)
                        .Select(a => $"{a.Text} - {a.Description}"));
 
-        return Task.FromResult((string?)Tools.EscapeMarkdown(text, ParseMode.MarkdownV2));
+        Text = text.ToEscapedMarkdownV2();
+        return Task.CompletedTask;;
     }
 }

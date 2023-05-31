@@ -1,51 +1,40 @@
+using SpinRallyBot.BackNavigations;
+using SpinRallyBot.Events.CommandReceivedConsumers.Base;
 using SpinRallyBot.Models;
 using SpinRallyBot.Subscriptions;
 using SpinRallyBot.Utils;
 
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
-public class StartCommandConsumer : IMediatorConsumer<CommandReceived> {
-    private readonly ITelegramBotClient _botClient;
+public class StartCommandConsumer : CommandReceivedConsumerBase {
     private readonly IScopedMediator _mediator;
 
-    public StartCommandConsumer(ITelegramBotClient botClient, IScopedMediator mediator) {
-        _botClient = botClient;
+    public StartCommandConsumer(ITelegramBotClient botClient, IScopedMediator mediator, IMemoryCache memoryCache)
+        : base(Command.Start, botClient, memoryCache, mediator) {
         _mediator = mediator;
     }
 
-    public async Task Consume(ConsumeContext<CommandReceived> context) {
-        if (context.Message is not {
-                Command: Command.Start,
-                ChatId: var chatId,
-                ChatType: ChatType.Private
-            }) {
-            return;
-        }
-
-        var cancellationToken = context.CancellationToken;
-
-        var commandMenu = CommandHelpers.CommandAttributeByCommand
+    protected override async Task ConsumeAndGetReply(long userId, long chatId, string[] args, CancellationToken cancellationToken) {
+        var commandMenuRows = CommandHelpers.CommandAttributeByCommand
             .Where(pair => pair.Value?.InlineName != null)
             .Select(pair => {
                 var name = pair.Value!.InlineName!;
-                var data = new CallbackData.PipelineData(pair.Value.Pipeline);
+                var data = new NavigationData.PipelineData(pair.Value.Pipeline);
                 return new InlineKeyboardButton(name) {
                     CallbackData = JsonSerializer.Serialize(data)
                 };
             })
-            .ToArray();
+            .Split(3);
 
         var subscriptions = (await _mediator.CreateRequestClient<GetSubscriptions>()
-            .GetResponse<Subscription[]>(new GetSubscriptions(chatId), cancellationToken)).Message;
+            .GetResponse<SubscriptionEntity[]>(new GetSubscriptions(chatId), cancellationToken)).Message;
 
-        var playerButtons = subscriptions.Select(s => new InlineKeyboardButton(s.Fio) {
-            CallbackData = JsonSerializer.Serialize(new CallbackData.CommandData(Command.Find, s.PlayerUrl))
-        }).Split(1);
-        var commandRows = commandMenu.Split(3).ToArray();
+        var playerButtonRows = subscriptions.Select(s => new InlineKeyboardButton(s.Fio) {
+            CallbackData = JsonSerializer.Serialize(new NavigationData.CommandData(Command.Find, s.PlayerUrl))
+        }).Split(1).ToArray();
 
-        await _botClient.SendTextMessageAsync(chatId,
-            "Главное меню",
-            replyMarkup: new InlineKeyboardMarkup(playerButtons.Union(commandRows)),
-            cancellationToken: cancellationToken);
+        await _mediator.Send(new ResetBackNavigation(userId, chatId), cancellationToken);
+        Text = "Главное меню";
+        InlineKeyboard = playerButtonRows.Union(commandMenuRows);
     }
 }

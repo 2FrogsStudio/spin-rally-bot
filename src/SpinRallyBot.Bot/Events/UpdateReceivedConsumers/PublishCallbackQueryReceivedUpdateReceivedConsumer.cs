@@ -15,9 +15,12 @@ public class PublishCallbackQueryReceivedUpdateReceivedConsumer : IMediatorConsu
                 Type: UpdateType.CallbackQuery,
                 CallbackQuery: {
                     Id: var callbackId,
-                    Message.Chat: {
-                        Id: var chatId,
-                        Type: var chatType
+                    Message: {
+                        MessageId: var messageId,
+                        Chat: {
+                            Id: var chatId,
+                            Type: var chatType
+                        }
                     },
                     From.Id: var userId,
                     Data: { } data
@@ -27,10 +30,12 @@ public class PublishCallbackQueryReceivedUpdateReceivedConsumer : IMediatorConsu
         }
 
         var cancellationToken = context.CancellationToken;
+
+        var navigationData = JsonSerializer.Deserialize<NavigationData>(data)!;
         try {
             await _mediator.Publish(new CallbackReceived(
-                MessageId: null,
-                Data: JsonSerializer.Deserialize<CallbackData>(data)!,
+                MessageId: messageId,
+                NavigationData: navigationData,
                 ChatId: chatId,
                 ChatType: chatType,
                 UserId: userId

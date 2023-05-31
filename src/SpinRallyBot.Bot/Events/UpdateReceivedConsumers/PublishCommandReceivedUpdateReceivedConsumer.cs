@@ -87,6 +87,7 @@ public class PublishCommandReceivedUpdateReceivedConsumer : IMediatorConsumer<Up
             chatId,
             chatType,
             messageId,
+            null,
             userId
         ), cancellationToken);
     }

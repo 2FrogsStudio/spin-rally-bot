@@ -15,7 +15,7 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
 
     public async Task Consume(ConsumeContext<CallbackReceived> context) {
         if (context.Message is not {
-                Data: CallbackData.PipelineData {
+                NavigationData: NavigationData.PipelineData {
                     Pipeline: Pipeline.Find,
                     Data: var data
                 },
@@ -33,8 +33,8 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
         switch (args) {
             case []:
                 //input player pipeline
-                await _mediator.Send(new SetPipelineData(userId, chatId, new PipelineData(Pipeline.Find)), cancellationToken);
                 var arg = Command.Find.GetAttributesOfType<CommandArgAttribute>()[0];
+                await _mediator.Send(new SetPipelineData(userId, chatId, new PipelineData(Pipeline.Find)), cancellationToken);
                 await _botClient.SendTextMessageAsync(
                     chatId,
                     arg.Name,
@@ -44,7 +44,7 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
                     }, cancellationToken: cancellationToken);
                 return;
             case [_]:
-                await _mediator.Publish(new CommandReceived(Command.Find, args, chatId, chatType, messageId, userId), cancellationToken);
+                await _mediator.Publish(new CommandReceived(Command.Find, args, chatId, chatType, null, messageId, userId), cancellationToken);
                 break;
             default:
                 throw new UnreachableException();

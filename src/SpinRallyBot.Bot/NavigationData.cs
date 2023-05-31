@@ -10,10 +10,11 @@ namespace SpinRallyBot;
 [JsonDerivedType(typeof(CommandData), "C")]
 [JsonDerivedType(typeof(PipelineData), "P")]
 [JsonDerivedType(typeof(ActionData), "A")]
-public abstract class CallbackData {
+[JsonDerivedType(typeof(BackData), "B")]
+public abstract class NavigationData {
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
     [JsonDerivedType(typeof(CommandData), "C")]
-    public class CommandData : CallbackData {
+    public class CommandData : NavigationData {
         public CommandData() { }
 
         public CommandData(Command command, string? data = null) {
@@ -28,7 +29,7 @@ public abstract class CallbackData {
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
     [JsonDerivedType(typeof(PipelineData), "P")]
-    public class PipelineData : CallbackData {
+    public class PipelineData : NavigationData {
         public PipelineData() { }
 
         public PipelineData(Pipeline pipeline, string? data = null) {
@@ -43,7 +44,7 @@ public abstract class CallbackData {
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
     [JsonDerivedType(typeof(ActionData), "A")]
-    public class ActionData : CallbackData {
+    public class ActionData : NavigationData {
         public ActionData() { }
 
         public ActionData(Actions action, string? data = null) {
@@ -54,5 +55,17 @@ public abstract class CallbackData {
         [JsonPropertyName("A")] public Actions Action { get; init; }
 
         [JsonPropertyName("D")] public string? Data { get; init; }
+    }
+
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
+    [JsonDerivedType(typeof(BackData), "B")]
+    public class BackData : NavigationData {
+        public BackData() { }
+
+        public BackData(Guid guid) {
+            Guid = guid;
+        }
+
+        [JsonPropertyName("G")] public Guid Guid { get; init; }
     }
 }

@@ -1,0 +1,53 @@
+namespace SpinRallyBot.BackNavigations;
+
+public record PushBackNavigation(long UserId, long ChatId, Guid Guid, string Name, NavigationData Data);
+
+public class PushBackNavigationConsumer : IMediatorConsumer<PushBackNavigation> {
+    private readonly AppDbContext _db;
+
+    public PushBackNavigationConsumer(AppDbContext db) {
+        _db = db;
+    }
+
+    public async Task Consume(ConsumeContext<PushBackNavigation> context) {
+        if (context.Message is not {
+                ChatId: var chatId,
+                UserId: var userId,
+                Guid: var guid,
+                Name: var name,
+                Data: var data
+            }) {
+            return;
+        }
+
+        var entity = await _db.BackNavigations.FindAsync(userId, chatId)
+                     ?? new Models.BackNavigationEntity {
+                         UserId = userId,
+                         ChatId = chatId
+                     };
+
+
+        var backNavigations = string.IsNullOrEmpty(entity.Data) 
+            ? new List<BackNavigations.BackNavigation>() 
+            : JsonSerializer.Deserialize<List<BackNavigations.BackNavigation>>(entity.Data)!;
+        
+        backNavigations.Add(new BackNavigations.BackNavigation(Guid: guid, Name: name, Data: data));
+
+        entity.Data = JsonSerializer.Serialize(backNavigations);
+
+        switch (_db.Entry(entity).State) {
+            case EntityState.Unchanged:
+                return;
+            case EntityState.Detached:
+                _db.BackNavigations.Add(entity);
+                break;
+            case EntityState.Modified:
+                _db.BackNavigations.Update(entity);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        await _db.SaveChangesAsync(context.CancellationToken);
+    }
+}

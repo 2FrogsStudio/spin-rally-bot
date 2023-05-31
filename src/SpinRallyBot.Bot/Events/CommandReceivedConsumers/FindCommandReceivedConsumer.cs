@@ -9,82 +9,81 @@ using SpinRallyBot.Utils;
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
 public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
-    private readonly ITelegramBotClient _botClient;
     private readonly IScopedMediator _mediator;
 
     public FindCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache, IScopedMediator mediator) :
-        base(Command.Find, botClient, memoryCache) {
-        _botClient = botClient;
+        base(Command.Find, botClient, memoryCache, mediator) {
         _mediator = mediator;
     }
 
-    protected override async Task<string?> ConsumeAndGetReply(long chatId, string[] args, CancellationToken cancellationToken) {
+    protected override async Task ConsumeAndGetReply(long userId, long chatId, string[] args, CancellationToken cancellationToken) {
         while (true)
             switch (args) {
                 case [{ } url, ..] when TryGetPlayerUrlAndId(url, out var playerUrl, out var playerId):
                     var result = await _mediator.CreateRequestClient<GetCachedPlayerInfo>()
                         .GetResponse<PlayerInfo, PlayerInfoNotFound>(new GetCachedPlayerInfo(playerUrl), cancellationToken);
-
-                    if (result.Is<PlayerInfo>(out var playerInfoResponse) && playerInfoResponse.Message is { } player) {
-                        var buttons = new List<InlineKeyboardButton>();
-
-                        var findSubscriptionResponse = await _mediator.CreateRequestClient<FindSubscription>()
-                            .GetResponse<Subscription, SubscriptionNotFound>(new FindSubscription(chatId, player.PlayerUrl), cancellationToken);
-
-                        if (findSubscriptionResponse.Is<Subscription>(out _)) {
-                            buttons.Add(new InlineKeyboardButton("Отписаться") {
-                                CallbackData = JsonSerializer.Serialize(new CallbackData.ActionData(Actions.Unsubscribe, player.PlayerUrl))
-                            });
-                        }
-                        if (findSubscriptionResponse.Is<SubscriptionNotFound>(out _)) {
-                            buttons.Add(new InlineKeyboardButton("Подписаться") {
-                                CallbackData = JsonSerializer.Serialize(new CallbackData.ActionData(Actions.Subscribe, player.PlayerUrl))
-                            });
-                        }
-
-                        var text =
-                            $"{player.Fio}\n" +
-                            $"Рейтинг: {player.Rating:F}\n" +
-                            $"Позиция: {player.Position}";
-                        await _botClient.SendTextMessageAsync(
-                            chatId,
-                            text.ToEscapedMarkdownV2(),
-                            parseMode: ParseMode.MarkdownV2,
-                            disableNotification: true,
-                            replyMarkup: new InlineKeyboardMarkup(buttons),
-                            cancellationToken: cancellationToken);
-
-                        text.ToEscapedMarkdownV2();
+                    if (result.Is<PlayerInfo>(out var playerInfoResponse) && playerInfoResponse.Message is { } player1) {
+                        await PlayerInfo(chatId, player1, cancellationToken);
+                        return;
                     }
-
                     if (result.Is<PlayerInfoNotFound>(out _)) {
-                        return $"Участник с идентификатором {playerId} не найден".ToEscapedMarkdownV2();
+                        Text = $"Участник с идентификатором {playerId} не найден".ToEscapedMarkdownV2();
+                        return;
                     }
-
                     throw new UnreachableException();
                 case [{ } search, ..]:
                     var players = await GetPlayersByName(search, cancellationToken);
-                    switch (players.Length) {
-                        case 0:
-                            return "Участники не найдены".ToEscapedMarkdownV2();
-                        case 1:
-                            args = new[] { players[0].PlayerUrl };
+                    switch (players) {
+                        case []:
+                            Text = "Участники не найдены".ToEscapedMarkdownV2();
+                            return;
+                        case [var player2]:
+                            args = new[] { player2.PlayerUrl };
                             continue;
                         default:
+                            //todo: pagination
                             var playerButtons = players
                                 .Select(p => {
-                                    var data = JsonSerializer.Serialize(new CallbackData.CommandData(Command.Find, p.PlayerUrl));
-                                    return new InlineKeyboardButton(p.Fio) { CallbackData = data };
+                                    var data = JsonSerializer.Serialize(new NavigationData.CommandData(Command.Find, p.PlayerUrl));
+                                    return new InlineKeyboardButton(p.Fio) {
+                                        CallbackData = data
+                                    };
                                 })
                                 .ToArray();
-                            await _botClient.SendTextMessageAsync(chatId, "Выберите участника", replyMarkup: new InlineKeyboardMarkup(playerButtons.Split(1)),
-                                cancellationToken: cancellationToken);
-                            return null;
+                            Text = "Выберите участника";
+                            InlineKeyboard = playerButtons.Split(1);
+                            return;
                     }
 
                 default:
-                    return CommandHelpers.HelpByCommand[Command.Find];
+                    Text = CommandHelpers.HelpByCommand[Command.Find];
+                    return;
             }
+    }
+
+    private async Task PlayerInfo(long chatId, PlayerInfo player, CancellationToken cancellationToken) {
+        var buttons = new List<InlineKeyboardButton>();
+
+        var findSubscriptionResponse = await _mediator.CreateRequestClient<FindSubscription>()
+            .GetResponse<SubscriptionEntity, SubscriptionNotFound>(new FindSubscription(chatId, player.PlayerUrl), cancellationToken);
+
+        if (findSubscriptionResponse.Is<SubscriptionEntity>(out _)) {
+            buttons.Add(new InlineKeyboardButton("Отписаться") {
+                CallbackData = JsonSerializer.Serialize(new NavigationData.ActionData(Actions.Unsubscribe, player.PlayerUrl))
+            });
+        }
+
+        if (findSubscriptionResponse.Is<SubscriptionNotFound>(out _)) {
+            buttons.Add(new InlineKeyboardButton("Подписаться") {
+                CallbackData = JsonSerializer.Serialize(new NavigationData.ActionData(Actions.Subscribe, player.PlayerUrl))
+            });
+        }
+
+        Text =
+            $"{player.Fio}\n".ToEscapedMarkdownV2() +
+            $"Рейтинг: {player.Rating:F}\n".ToEscapedMarkdownV2() +
+            $"Позиция: {player.Position}".ToEscapedMarkdownV2();
+        InlineKeyboard = buttons.Split(1);
     }
 
     private async Task<Player[]> GetPlayersByName(string search, CancellationToken cancellationToken) {

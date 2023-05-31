@@ -17,10 +17,8 @@ public enum Command {
         Pipeline = Pipeline.Find,
         Description = "Найти игрока по ФИО или ссылке на r.ttw.ru"
     )]
-    [CommandArg("запрос",
-        "Имя для поиска или ссылка на игрока(https://r.ttw.ru/players/?id=52a31ad)",
-        CommandArgType.Input
-    )]
+    [CommandArg("[Запрос]",
+        "Имя для поиска или ссылка на игрока(https://r.ttw.ru/players/?id=52a31ad)")]
     Find,
 
     [Command(
@@ -28,9 +26,4 @@ public enum Command {
         Description = "Show this help"
     )]
     Help
-}
-
-public enum CommandArgType {
-    Input,
-    Select
 }

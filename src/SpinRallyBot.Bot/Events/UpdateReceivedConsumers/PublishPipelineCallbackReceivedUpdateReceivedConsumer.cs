@@ -1,20 +1,15 @@
 using System.Diagnostics;
+using SpinRallyBot.BackNavigations;
 using SpinRallyBot.PipelineStateMachine;
 
 namespace SpinRallyBot.Events.UpdateReceivedConsumers;
 
 public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorConsumer<UpdateReceived> {
-    private readonly ITelegramBotClient _botClient;
-    private readonly IHostEnvironment _hostEnvironment;
-    private readonly ILogger<PublishPipelineCallbackReceivedUpdateReceivedConsumer> _logger;
     private readonly IScopedMediator _mediator;
+    private readonly ITelegramBotClient _botClient;
 
-    public PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediator mediator,
-        ILogger<PublishPipelineCallbackReceivedUpdateReceivedConsumer> logger, IHostEnvironment hostEnvironment,
-        ITelegramBotClient botClient) {
+    public PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediator mediator, ITelegramBotClient botClient) {
         _mediator = mediator;
-        _logger = logger;
-        _hostEnvironment = hostEnvironment;
         _botClient = botClient;
     }
 
@@ -25,13 +20,12 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorCo
         if (update is not {
                 Message : {
                     Text: { } messageText,
-                    MessageId: var messageId,
                     From.Id: var userId,
                     Chat: {
                         Type: var chatType,
                         Id: var chatId
                     }
-                } message
+                }
             }
             || messageText.StartsWith('/')) {
             return;
@@ -45,12 +39,8 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorCo
             return;
         }
 
-        if (!result.Is<PipelineData>(out var response) || response is not {
-                Message: {
-                    Pipeline: var pipeline,
-                    Args: var args
-                }
-            }) {
+        if (!result.Is<PipelineData>(out var response)
+            || response is not { Message: { Pipeline: var pipeline, Args: var args } }) {
             throw new UnreachableException();
         }
 
@@ -59,11 +49,13 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorCo
             : args.Append(messageText).ToArray();
 
         var data = string.Join(' ', args);
-
+        var navigationData = new NavigationData.PipelineData(pipeline, data);
+        await _mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "↩︎ Список", navigationData), cancellationToken);
+        // await _botClient.DeleteMessageAsync(chatId, messageId, cancellationToken);
         try {
             await _mediator.Publish(new CallbackReceived(
                 MessageId: null,
-                Data: new CallbackData.PipelineData(pipeline, data),
+                NavigationData: navigationData,
                 ChatId: chatId,
                 ChatType: chatType,
                 UserId: userId

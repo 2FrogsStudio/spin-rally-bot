@@ -13,7 +13,7 @@ public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsum
 
     public async Task Consume(ConsumeContext<CallbackReceived> context) {
         if (context.Message is not {
-                Data: CallbackData.ActionData {
+                NavigationData: NavigationData.ActionData {
                     Action: var action and (Actions.Subscribe or Actions.Unsubscribe),
                     Data: { } playerUrl
                 },
@@ -38,6 +38,6 @@ public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsum
                 throw new UnreachableException();
         }
 
-        await _mediator.Publish(new CallbackReceived(new CallbackData.CommandData(Command.Start), messageId, chatId, chatType, userId), cancellationToken);
+        await _mediator.Publish(new CallbackReceived(new NavigationData.CommandData(Command.Start), messageId, chatId, chatType, userId), cancellationToken);
     }
 }
