@@ -1,6 +1,6 @@
 // Global using directives
 
-global using System.Globalization;
+global using System.Text.Json;
 global using MassTransit;
 global using MassTransit.Mediator;
 global using Microsoft.EntityFrameworkCore;

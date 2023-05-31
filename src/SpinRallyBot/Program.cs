@@ -8,6 +8,7 @@ var host = Host.CreateApplicationBuilder(args)
     .AddDatabase()
     .AddMassTransit()
     .AddTelegramBot()
+    .AddTtwClient()
     .Build();
 
 host

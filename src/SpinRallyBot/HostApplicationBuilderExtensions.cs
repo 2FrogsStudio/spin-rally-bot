@@ -28,7 +28,7 @@ public static class HostApplicationBuilderExtensions {
     public static HostApplicationBuilder AddMassTransit(this HostApplicationBuilder builder) {
         builder.Services
             .AddMassTransit(x => {
-                x.AddConsumers(type => !type.IsAssignableTo(typeof(IMediatorConsumer)),
+                x.AddConsumers(type => !type.IsAssignableTo(typeof(IMediatorConsumer<>)),
                     typeof(ShutdownApplicationPullingServiceActivatedConsumer).Assembly);
                 var amqpUri = builder.Configuration["AMQP_URI"];
                 if (amqpUri is not null) {
@@ -41,8 +41,8 @@ public static class HostApplicationBuilderExtensions {
                 }
             })
             .AddMediator(x => {
-                x.AddConsumers(type => type.IsAssignableTo(typeof(IMediatorConsumer)),
-                    typeof(CommandUpdateReceivedConsumer).Assembly);
+                x.AddConsumers(type => type.IsAssignableToGenericType(typeof(IMediatorConsumer<>)),
+                    typeof(PublishCommandReceivedUpdateReceivedConsumer).Assembly);
             });
         return builder;
     }

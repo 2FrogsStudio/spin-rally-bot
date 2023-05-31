@@ -3,8 +3,8 @@ using SpinRallyBot.Events;
 namespace SpinRallyBot.Services;
 
 internal class PullingService : BackgroundService {
-    private readonly ITelegramBotClient _client;
     private readonly IBus _bus;
+    private readonly ITelegramBotClient _client;
     private readonly ILogger<PullingService> _logger;
     private readonly ReceiverOptions _receiverOptions;
     private readonly IUpdateHandler _updateHandler;
@@ -26,7 +26,7 @@ internal class PullingService : BackgroundService {
             _logger.LogInformation("Starting polling service");
 
             await _bus.Publish(new PullingServiceActivated(Constants.ApplicationStartDate), stoppingToken);
-            
+
             try {
                 await _client.ReceiveAsync(_updateHandler, _receiverOptions, stoppingToken);
             } catch (Exception ex) {

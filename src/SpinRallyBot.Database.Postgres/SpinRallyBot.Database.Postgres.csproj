@@ -1,15 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SpinRallyBot.Database.Models\SpinRallyBot.Database.Models.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ModelConfigurations\" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SpinRallyBot.Database.Models\SpinRallyBot.Database.Models.csproj" />
+    </ItemGroup>
 
 </Project>

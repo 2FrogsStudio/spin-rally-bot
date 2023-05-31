@@ -18,12 +18,36 @@ namespace SpinRallyBot.Migrations
 
             modelBuilder.Entity("SpinRallyBot.Models.PipelineState", b =>
                 {
-                    b.Property<string>("Command")
+                    b.Property<long>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Command");
+                    b.HasKey("UserId", "ChatId");
 
-                    b.ToTable("PipelineStates");
+                    b.ToTable("PipelineState");
+                });
+
+            modelBuilder.Entity("SpinRallyBot.Models.Subscription", b =>
+                {
+                    b.Property<string>("PlayerUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Fio")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PlayerUrl");
+
+                    b.ToTable("Subscriptions");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,19 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <PackageReference Include="MassTransit.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="Microsoft.Extensions.Http" />
-    <PackageReference Include="Telegram.Bot" />
-    <PackageReference Include="Telegram.Bot.Extensions.Markup" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MassTransit.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
+        <PackageReference Include="Microsoft.Extensions.Http" />
+        <PackageReference Include="Telegram.Bot" />
+        <PackageReference Include="Telegram.Bot.Extensions.Markup" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SpinRallyBot.Abstract\SpinRallyBot.Abstract.csproj" />
-    <ProjectReference Include="..\SpinRallyBot.Constants\SpinRallyBot.Constants.csproj" />
-    <ProjectReference Include="..\SpinRallyBot.Database.Models\SpinRallyBot.Database.Models.csproj" />
-    <ProjectReference Include="..\SpinRallyBot.Utils\SpinRallyBot.Utils.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SpinRallyBot.Abstract\SpinRallyBot.Abstract.csproj" />
+        <ProjectReference Include="..\SpinRallyBot.Constants\SpinRallyBot.Constants.csproj" />
+        <ProjectReference Include="..\SpinRallyBot.Database.Models\SpinRallyBot.Database.Models.csproj" />
+        <ProjectReference Include="..\SpinRallyBot.TtwClient\SpinRallyBot.TtwClient.csproj" />
+        <ProjectReference Include="..\SpinRallyBot.Utils\SpinRallyBot.Utils.csproj" />
+    </ItemGroup>
 
 </Project>

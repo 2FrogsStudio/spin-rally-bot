@@ -24,7 +24,7 @@ internal class BotInit : IHostedService {
         var commands = CommandHelpers.CommandAttributeByCommand.Values
             .Where(d => d is { IsInitCommand: true })
             .Select(d => new BotCommand {
-                Command = d!.Text,
+                Command = d!.Text!,
                 Description = d.Description ?? string.Empty
             });
         await _botClient.SetMyCommandsAsync(commands, cancellationToken: cancellationToken);

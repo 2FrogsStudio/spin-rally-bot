@@ -15,7 +15,7 @@ public static class HostApplicationBuilderExtensions {
             .AddTypedClient<ITelegramBotClient>(client => new TelegramBotClient(botToken, client));
         builder.Services.AddHostedService<BotInit>()
             .AddHostedService<PullingService>()
-            .AddSingleton<IUpdateHandler, BotUpdateHandler>();
+            .AddSingleton<IUpdateHandler, UpdateHandler>();
         return builder;
     }
 }
