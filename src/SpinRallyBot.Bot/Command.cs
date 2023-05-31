@@ -13,7 +13,7 @@ public enum Command {
 
     [Command(
         Text = "/find",
-        InlineName = "Поиск",
+        InlineName = "🔎 Поиск",
         Pipeline = Pipeline.Find,
         Description = "Найти игрока по ФИО или ссылке на r.ttw.ru"
     )]

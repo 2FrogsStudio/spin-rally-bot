@@ -17,7 +17,7 @@ public class ResetBackNavigationConsumer : IMediatorConsumer<ResetBackNavigation
                      ?? new Models.BackNavigationEntity { UserId = userId, ChatId = chatId };
 
         entity.Data = JsonSerializer.Serialize(new BackNavigations.BackNavigation[] {
-            new(Guid: Guid.NewGuid(), Name: "≡ Меню", Data: new NavigationData.CommandData(Command.Start))
+            new(Guid: Guid.NewGuid(), Name: "↩︎ Меню", Data: new NavigationData.CommandData(Command.Start))
         });
 
         switch (_db.Entry(entity).State) {

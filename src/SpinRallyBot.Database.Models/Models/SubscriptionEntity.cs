@@ -4,5 +4,6 @@ namespace SpinRallyBot.Models;
 public class SubscriptionEntity {
     public long ChatId { get; set; }
     public string PlayerUrl { get; set; } = null!;
-    public string Fio { get; set; } = null!;
+    
+    public PlayerEntity Player { get; set; } = null!;
 }

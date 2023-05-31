@@ -47,7 +47,7 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorCo
 
         var data = string.Join(' ', args);
         var navigationData = new NavigationData.PipelineData(pipeline, data);
-        await _mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "↩︎ Список", navigationData), cancellationToken);
+        await _mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "≡ Список", navigationData), cancellationToken);
         try {
             await _mediator.Publish(new CallbackReceived(
                 MessageId: null,

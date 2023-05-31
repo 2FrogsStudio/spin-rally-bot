@@ -1,6 +1,6 @@
 namespace SpinRallyBot.Subscriptions;
 
-public record GetSubscriptions(long ChatId) { }
+public record GetSubscriptions(long ChatId);
 
 public class GetSubscriptionsConsumer : IMediatorConsumer<GetSubscriptions> {
     private readonly AppDbContext _db;
@@ -14,6 +14,7 @@ public class GetSubscriptionsConsumer : IMediatorConsumer<GetSubscriptions> {
 
         var subscriptions = await _db.Subscriptions
             .Where(s => s.ChatId == context.Message.ChatId)
+            .Select(s => new SubscriptionResult(s.Player.Fio, s.PlayerUrl))
             .ToArrayAsync(cancellationToken);
 
         await context.RespondAsync(subscriptions);

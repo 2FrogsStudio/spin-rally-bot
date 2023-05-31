@@ -56,6 +56,20 @@ namespace SpinRallyBot.Migrations
                     b.ToTable("PipelineState");
                 });
 
+            modelBuilder.Entity("SpinRallyBot.Models.PlayerEntity", b =>
+                {
+                    b.Property<string>("PlayerUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Fio")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("PlayerUrl");
+
+                    b.ToTable("Players");
+                });
+
             modelBuilder.Entity("SpinRallyBot.Models.SubscriptionEntity", b =>
                 {
                     b.Property<long>("ChatId")
@@ -64,13 +78,27 @@ namespace SpinRallyBot.Migrations
                     b.Property<string>("PlayerUrl")
                         .HasColumnType("text");
 
-                    b.Property<string>("Fio")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("ChatId", "PlayerUrl");
 
+                    b.HasIndex("PlayerUrl");
+
                     b.ToTable("Subscriptions");
+                });
+
+            modelBuilder.Entity("SpinRallyBot.Models.SubscriptionEntity", b =>
+                {
+                    b.HasOne("SpinRallyBot.Models.PlayerEntity", "Player")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("PlayerUrl")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Player");
+                });
+
+            modelBuilder.Entity("SpinRallyBot.Models.PlayerEntity", b =>
+                {
+                    b.Navigation("Subscriptions");
                 });
 #pragma warning restore 612, 618
         }

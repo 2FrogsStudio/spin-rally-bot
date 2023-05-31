@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using SpinRallyBot.BackNavigations;
 using SpinRallyBot.Subscriptions;
 
 namespace SpinRallyBot.Events.CallbackReceivedConsumers;

@@ -20,16 +20,19 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
         while (true)
             switch (args) {
                 case [{ } url, ..] when TryGetPlayerUrlAndId(url, out var playerUrl, out var playerId):
-                    var result = await _mediator.CreateRequestClient<GetCachedPlayerInfo>()
+                    var result = await _mediator
+                        .CreateRequestClient<GetCachedPlayerInfo>()
                         .GetResponse<PlayerInfo, PlayerInfoNotFound>(new GetCachedPlayerInfo(playerUrl), cancellationToken);
                     if (result.Is<PlayerInfo>(out var playerInfoResponse) && playerInfoResponse.Message is { } player1) {
                         await PlayerInfo(chatId, player1, cancellationToken);
                         return;
                     }
+
                     if (result.Is<PlayerInfoNotFound>(out _)) {
                         Text = $"Участник с идентификатором {playerId} не найден".ToEscapedMarkdownV2();
                         return;
                     }
+
                     throw new UnreachableException();
                 case [{ } search, ..]:
                     var players = await GetPlayersByName(search, cancellationToken);
@@ -64,10 +67,11 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
     private async Task PlayerInfo(long chatId, PlayerInfo player, CancellationToken cancellationToken) {
         var buttons = new List<InlineKeyboardButton>();
 
-        var findSubscriptionResponse = await _mediator.CreateRequestClient<FindSubscription>()
-            .GetResponse<SubscriptionEntity, SubscriptionNotFound>(new FindSubscription(chatId, player.PlayerUrl), cancellationToken);
+        var findSubscriptionResponse = await _mediator
+            .CreateRequestClient<FindSubscription>()
+            .GetResponse<SubscriptionResult, SubscriptionNotFound>(new FindSubscription(chatId, player.PlayerUrl), cancellationToken);
 
-        if (findSubscriptionResponse.Is<SubscriptionEntity>(out _)) {
+        if (findSubscriptionResponse.Is<SubscriptionResult>(out _)) {
             buttons.Add(new InlineKeyboardButton("Отписаться") {
                 CallbackData = JsonSerializer.Serialize(new NavigationData.ActionData(Actions.Unsubscribe, player.PlayerUrl))
             });

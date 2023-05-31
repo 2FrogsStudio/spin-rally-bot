@@ -1,6 +1,5 @@
 using SpinRallyBot.Events.CommandReceivedConsumers.Base;
 using SpinRallyBot.Utils;
-using Telegram.Bot.Extensions.Markup;
 
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 

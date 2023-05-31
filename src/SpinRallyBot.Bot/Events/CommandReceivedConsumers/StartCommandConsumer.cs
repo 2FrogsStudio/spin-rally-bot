@@ -26,16 +26,17 @@ public class StartCommandConsumer : CommandReceivedConsumerBase {
             })
             .Split(3);
 
-        var subscriptions = (await _mediator.CreateRequestClient<GetSubscriptions>()
-            .GetResponse<SubscriptionEntity[]>(new GetSubscriptions(chatId), cancellationToken)).Message;
+        var subscriptions = (await _mediator
+            .CreateRequestClient<GetSubscriptions>()
+            .GetResponse<SubscriptionResult[]>(new GetSubscriptions(chatId), cancellationToken)).Message;
 
-        var playerButtonRows = subscriptions.Select(s => new InlineKeyboardButton(s.Fio) {
-            CallbackData = JsonSerializer.Serialize(new NavigationData.CommandData(Command.Find, s.PlayerUrl))
-        }).Split(1).ToArray();
+        var playerButtonRows = subscriptions
+            .Select(s => new InlineKeyboardButton(s.Fio) {
+                CallbackData = JsonSerializer.Serialize(new NavigationData.CommandData(Command.Find, s.PlayerUrl))
+            }).Split(1).ToArray();
 
         Text = "Главное меню";
         InlineKeyboard = playerButtonRows.Union(commandMenuRows);
-
         await _mediator.Send(new ResetBackNavigation(userId, chatId), cancellationToken);
     }
 }

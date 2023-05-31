@@ -5,4 +5,5 @@ public abstract class AppDbContext : DbContext {
     public DbSet<PipelineStateEntity> PipelineState { get; set; } = null!;
     public DbSet<SubscriptionEntity> Subscriptions { get; set; } = null!;
     public DbSet<BackNavigationEntity> BackNavigations { get; set; } = null!;
+    public DbSet<PlayerEntity> Players { get; set; } = null!;
 }

@@ -1,3 +1,5 @@
+using SpinRallyBot.Commands;
+
 namespace SpinRallyBot.Queries;
 
 public record GetCachedPlayerInfo(string PlayerUrl);
@@ -7,10 +9,12 @@ public record PlayerInfoNotFound;
 public class GetCachedPlayerInfoConsumer : IMediatorConsumer<GetCachedPlayerInfo> {
     private readonly IMemoryCache _cache;
     private readonly ITtwClient _ttwClient;
+    private readonly IScopedMediator _mediator;
 
-    public GetCachedPlayerInfoConsumer(ITtwClient ttwClient, IMemoryCache cache) {
+    public GetCachedPlayerInfoConsumer(ITtwClient ttwClient, IMemoryCache cache, IScopedMediator mediator) {
         _ttwClient = ttwClient;
         _cache = cache;
+        _mediator = mediator;
     }
 
     public async Task Consume(ConsumeContext<GetCachedPlayerInfo> context) {
@@ -21,10 +25,10 @@ public class GetCachedPlayerInfoConsumer : IMediatorConsumer<GetCachedPlayerInfo
             entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
             entry.SetSize(1);
             return await _ttwClient.GetPlayerInfo(playerUrl, cancellationToken);
-            ;
         });
 
         if (playerInfo is not null) {
+            await _mediator.Send(new AddPlayerToDb(playerInfo), cancellationToken);
             await context.RespondAsync(playerInfo);
         } else {
             await context.RespondAsync(new PlayerInfoNotFound());

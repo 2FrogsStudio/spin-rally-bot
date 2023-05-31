@@ -45,7 +45,6 @@ public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
 
         entity ??= new SubscriptionEntity {
             ChatId = chatId,
-            Fio = player.Fio,
             PlayerUrl = player.PlayerUrl
         };
         _db.Subscriptions.Add(entity);
