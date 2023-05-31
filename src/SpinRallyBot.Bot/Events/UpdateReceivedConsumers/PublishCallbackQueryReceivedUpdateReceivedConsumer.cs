@@ -35,7 +35,7 @@ public class PublishCallbackQueryReceivedUpdateReceivedConsumer : IMediatorConsu
         try {
             await _mediator.Publish(new CallbackReceived(
                 MessageId: messageId,
-                NavigationData: navigationData,
+                Data: navigationData,
                 ChatId: chatId,
                 ChatType: chatType,
                 UserId: userId

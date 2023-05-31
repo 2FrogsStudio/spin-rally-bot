@@ -6,11 +6,9 @@ namespace SpinRallyBot.Events.UpdateReceivedConsumers;
 
 public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorConsumer<UpdateReceived> {
     private readonly IScopedMediator _mediator;
-    private readonly ITelegramBotClient _botClient;
 
-    public PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediator mediator, ITelegramBotClient botClient) {
+    public PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediator mediator) {
         _mediator = mediator;
-        _botClient = botClient;
     }
 
     public async Task Consume(ConsumeContext<UpdateReceived> context) {
@@ -44,18 +42,16 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorCo
             throw new UnreachableException();
         }
 
-        args = args is null
-            ? new[] { messageText }
-            : args.Append(messageText).ToArray();
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+        args = args?.Append(messageText).ToArray() ?? new[] { messageText };
 
         var data = string.Join(' ', args);
         var navigationData = new NavigationData.PipelineData(pipeline, data);
         await _mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "↩︎ Список", navigationData), cancellationToken);
-        // await _botClient.DeleteMessageAsync(chatId, messageId, cancellationToken);
         try {
             await _mediator.Publish(new CallbackReceived(
                 MessageId: null,
-                NavigationData: navigationData,
+                Data: navigationData,
                 ChatId: chatId,
                 ChatType: chatType,
                 UserId: userId

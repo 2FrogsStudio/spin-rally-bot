@@ -14,7 +14,7 @@ public class BackActionCallbackReceivedConsumer : IMediatorConsumer<CallbackRece
 
     public async Task Consume(ConsumeContext<CallbackReceived> context) {
         if (context.Message is not {
-                NavigationData: NavigationData.BackData {
+                Data: NavigationData.BackData {
                     Guid: var guid
                 },
                 ChatId: var chatId,

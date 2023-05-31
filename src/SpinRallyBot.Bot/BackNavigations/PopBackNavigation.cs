@@ -1,6 +1,6 @@
 namespace SpinRallyBot.BackNavigations;
 
-public record PopBackNavigation(long UserId, long ChatId, Guid Guid);
+public record PopBackNavigation(long UserId, long ChatId, Guid? Guid = null);
 
 public record EmptyNavigation;
 
@@ -17,14 +17,20 @@ public class PopBackNavigationConsumer : IMediatorConsumer<PopBackNavigation> {
         var entity = await _db.BackNavigations.FindAsync(query.UserId, query.ChatId);
 
         if (string.IsNullOrEmpty(entity?.Data)
-            || JsonSerializer.Deserialize<List<BackNavigations.BackNavigation>>(entity.Data) is not { } list) {
+            || JsonSerializer.Deserialize<List<BackNavigation>>(entity.Data) is not { } list
+            || list.Count == 0) {
             await context.RespondAsync(new EmptyNavigation());
             return;
         }
 
-        var findIndex = list.FindIndex(navigation => navigation.Guid == query.Guid);
+        var findIndex = query.Guid is not null 
+            ? list.FindIndex(navigation => navigation.Guid == query.Guid) 
+            : list.Count - 1;
 
-        var result = list[findIndex];
+        if (findIndex == -1 || list[findIndex] is not {} result) {
+            await context.RespondAsync(new EmptyNavigation());
+            return;
+        }
 
         if (findIndex + 1 < list.Count) {
             list.RemoveRange(findIndex, list.Count - findIndex);

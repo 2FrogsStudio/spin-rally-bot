@@ -15,7 +15,7 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
 
     public async Task Consume(ConsumeContext<CallbackReceived> context) {
         if (context.Message is not {
-                NavigationData: NavigationData.PipelineData {
+                Data: NavigationData.PipelineData {
                     Pipeline: Pipeline.Find,
                     Data: var data
                 },

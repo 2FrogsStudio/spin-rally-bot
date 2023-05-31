@@ -33,8 +33,9 @@ public class StartCommandConsumer : CommandReceivedConsumerBase {
             CallbackData = JsonSerializer.Serialize(new NavigationData.CommandData(Command.Find, s.PlayerUrl))
         }).Split(1).ToArray();
 
-        await _mediator.Send(new ResetBackNavigation(userId, chatId), cancellationToken);
         Text = "Главное меню";
         InlineKeyboard = playerButtonRows.Union(commandMenuRows);
+
+        await _mediator.Send(new ResetBackNavigation(userId, chatId), cancellationToken);
     }
 }

@@ -9,7 +9,7 @@ public class CommandCallbackReceivedConsumer : IMediatorConsumer<CallbackReceive
 
     public async Task Consume(ConsumeContext<CallbackReceived> context) {
         if (context.Message is not {
-                NavigationData: NavigationData.CommandData {
+                Data: NavigationData.CommandData {
                     Command: var command,
                     Data: var data
                 },

@@ -51,11 +51,11 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
             && listResponse.Message is { } list) {
             var backButtons = list.Select(l => new InlineKeyboardButton(l.Name) {
                 CallbackData = JsonSerializer.Serialize(new NavigationData.BackData { Guid = l.Guid })
-            }).Split(1);
+            }).Split(3);
 
             InlineKeyboard = InlineKeyboard is null ? backButtons : InlineKeyboard.Union(backButtons);
         }
-
+        
         if (menuMessageId.HasValue) {
             await _bot.EditMessageTextAsync(
                 chatId,
