@@ -28,7 +28,7 @@ public class TtwClient : ITtwClient {
 
         var playerPage = doc.QuerySelector("div.player-page");
 
-        var rating = float.Parse(playerPage!.QuerySelector("div.header-rating")!.Text());
+        var rating = float.Parse(playerPage!.QuerySelector("div.player-all-games th.rating-rating-cell")!.Text());
         var position = uint.Parse(playerPage.QuerySelector("div.header-position")!.Text());
 
         return new PlayerInfo(
