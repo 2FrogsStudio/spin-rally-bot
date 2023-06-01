@@ -38,6 +38,7 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
                 await _botClient.SendTextMessageAsync(
                     chatId,
                     arg.Name,
+                    disableNotification: true,
                     replyMarkup: new ForceReplyMarkup {
                         Selective = true,
                         InputFieldPlaceholder = arg.Description

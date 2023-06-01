@@ -74,6 +74,7 @@ public class PublishCommandReceivedUpdateReceivedConsumer : IMediatorConsumer<Up
                     chatId,
                     help,
                     parseMode: ParseMode.MarkdownV2,
+                    disableNotification: true,
                     replyToMessageId: messageId,
                     replyMarkup: new ReplyKeyboardRemove(),
                     cancellationToken: context.CancellationToken);
