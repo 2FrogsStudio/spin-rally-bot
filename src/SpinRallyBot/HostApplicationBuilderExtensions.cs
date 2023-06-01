@@ -28,10 +28,9 @@ public static class HostApplicationBuilderExtensions {
     public static HostApplicationBuilder AddMassTransit(this HostApplicationBuilder builder) {
         builder.Services
             .AddMassTransit(x => {
-                x.AddConsumers(type => !type.IsAssignableTo(typeof(IMediatorConsumer<>)),
+                x.AddConsumers(type => !type.IsAssignableToGenericType(typeof(IMediatorConsumer<>)),
                     typeof(ShutdownApplicationPullingServiceActivatedConsumer).Assembly);
-                var amqpUri = builder.Configuration["AMQP_URI"];
-                if (amqpUri is not null) {
+                if (builder.Configuration["AMQP_URI"] is { } amqpUri) {
                     x.UsingRabbitMq((context, cfg) => {
                         cfg.Host(amqpUri);
                         cfg.ConfigureEndpoints(context);
