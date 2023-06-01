@@ -20,9 +20,9 @@ public class GetCachedPlayerInfoConsumer : IMediatorConsumer<GetCachedPlayerInfo
     public async Task Consume(ConsumeContext<GetCachedPlayerInfo> context) {
         var cancellationToken = context.CancellationToken;
         var playerUrl = context.Message.PlayerUrl;
-
+        
         var playerInfo = await _cache.GetOrCreateAsync($"{nameof(GetCachedPlayerInfo)}_{playerUrl}", async entry => {
-            entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+            entry.SetAbsoluteExpiration(TimeSpan.FromHours(1));
             entry.SetSize(1);
             return await _ttwClient.GetPlayerInfo(playerUrl, cancellationToken);
         });
