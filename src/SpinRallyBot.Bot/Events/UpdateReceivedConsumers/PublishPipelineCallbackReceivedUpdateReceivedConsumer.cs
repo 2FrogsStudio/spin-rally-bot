@@ -45,8 +45,7 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorCo
         // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
         args = args?.Append(messageText).ToArray() ?? new[] { messageText };
 
-        var data = string.Join(' ', args);
-        var navigationData = new NavigationData.PipelineData(pipeline, data);
+        var navigationData = new NavigationData.PipelineData(pipeline, args);
         await _mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "≡ Список", navigationData), cancellationToken);
         try {
             await _mediator.Publish(new CallbackReceived(

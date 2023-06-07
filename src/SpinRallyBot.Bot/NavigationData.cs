@@ -32,14 +32,14 @@ public abstract class NavigationData {
     public class PipelineData : NavigationData {
         public PipelineData() { }
 
-        public PipelineData(Pipeline pipeline, string? data = null) {
+        public PipelineData(Pipeline pipeline, string[]? data = null) {
             Pipeline = pipeline;
-            Data = data;
+            Data = data ?? Array.Empty<string>();
         }
 
         [JsonPropertyName("P")] public Pipeline Pipeline { get; init; }
 
-        [JsonPropertyName("D")] public string? Data { get; init; }
+        [JsonPropertyName("D")] public string[] Data { get; init; } = Array.Empty<string>();
     }
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]

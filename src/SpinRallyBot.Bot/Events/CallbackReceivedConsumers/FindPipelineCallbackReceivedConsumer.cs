@@ -27,7 +27,8 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
             return;
         }
 
-        var args = data?.Split(' ') ?? Array.Empty<string>();
+        // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
+        var args = data ?? Array.Empty<string>();
         var cancellationToken = context.CancellationToken;
 
         switch (args) {
