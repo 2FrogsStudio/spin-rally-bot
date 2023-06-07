@@ -1,9 +1,9 @@
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
 public class HelpCommandReceivedConsumer : CommandReceivedConsumerBase {
-    public HelpCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache,
+    public HelpCommandReceivedConsumer(ITelegramBotClient botClient,
         IScopedMediator mediator) :
-        base(Command.Help, botClient, memoryCache, mediator) { }
+        base(Command.Help, botClient, mediator) { }
 
     protected override Task ConsumeAndGetReply(long userId, long chatId, string[] args,
         CancellationToken cancellationToken) {

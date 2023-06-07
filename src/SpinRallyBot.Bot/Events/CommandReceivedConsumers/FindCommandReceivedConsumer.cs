@@ -5,9 +5,9 @@ namespace SpinRallyBot.Events.CommandReceivedConsumers;
 public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
     private readonly IScopedMediator _mediator;
 
-    public FindCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache,
+    public FindCommandReceivedConsumer(ITelegramBotClient botClient,
         IScopedMediator mediator) :
-        base(Command.Find, botClient, memoryCache, mediator) {
+        base(Command.Find, botClient, mediator) {
         _mediator = mediator;
     }
 

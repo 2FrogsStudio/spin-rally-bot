@@ -3,8 +3,8 @@ namespace SpinRallyBot.Events.CommandReceivedConsumers;
 public class StartCommandConsumer : CommandReceivedConsumerBase {
     private readonly IScopedMediator _mediator;
 
-    public StartCommandConsumer(ITelegramBotClient botClient, IScopedMediator mediator, IMemoryCache memoryCache)
-        : base(Command.Start, botClient, memoryCache, mediator) {
+    public StartCommandConsumer(ITelegramBotClient botClient, IScopedMediator mediator)
+        : base(Command.Start, botClient, mediator) {
         _mediator = mediator;
     }
 

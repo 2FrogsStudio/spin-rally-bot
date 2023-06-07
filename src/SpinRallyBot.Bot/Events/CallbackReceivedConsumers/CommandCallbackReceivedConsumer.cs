@@ -22,6 +22,7 @@ public class CommandCallbackReceivedConsumer : IMediatorConsumer<CallbackReceive
             return;
         }
 
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
         var args = data?.Split(' ') ?? Array.Empty<string>();
 
         await _mediator.Publish(new CommandReceived(command, args, chatId, chatType, null, messageId, userId),

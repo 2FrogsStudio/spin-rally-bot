@@ -4,13 +4,11 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
     private readonly ITelegramBotClient _bot;
     private readonly Command _command;
     private readonly IScopedMediator _mediator;
-    private readonly IMemoryCache _memoryCache;
 
-    protected CommandReceivedConsumerBase(Command command, ITelegramBotClient bot, IMemoryCache memoryCache,
+    protected CommandReceivedConsumerBase(Command command, ITelegramBotClient bot,
         IScopedMediator mediator) {
         _command = command;
         _bot = bot;
-        _memoryCache = memoryCache;
         _mediator = mediator;
     }
 
@@ -25,7 +23,6 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
         var cancellationToken = context.CancellationToken;
 
         if (context.Message is not {
-                Command: var command,
                 Args: var args,
                 ChatId: var chatId,
                 ChatType: var chatType,
@@ -36,9 +33,6 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
             return;
         }
 
-        var isAdmin = chatType == ChatType.Private || await IsChatAdmin(chatId, userId, cancellationToken);
-
-        // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
         await ConsumeAndGetReply(userId, chatId, args, cancellationToken);
 
         if (Text is null) {
@@ -59,6 +53,7 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
             InlineKeyboard = InlineKeyboard is null ? backButtons : InlineKeyboard.Union(backButtons);
         }
 
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (menuMessageId.HasValue) {
             await _bot.EditMessageTextAsync(
                 chatId,
@@ -81,17 +76,6 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
                 cancellationToken: cancellationToken
             );
         }
-    }
-
-    private async Task<bool> IsChatAdmin(long chatId, long userId, CancellationToken cancellationToken) {
-        var cache = await _memoryCache.GetOrCreateAsync($"AdminIdsByChatId_{chatId}", async entry => {
-            entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
-            entry.SetSize(1);
-            var admins = await _bot.GetChatAdministratorsAsync(chatId, cancellationToken);
-            return admins.Select(a => a.User.Id).ToArray();
-        });
-
-        return cache?.Contains(userId) ?? false;
     }
 
     protected abstract Task ConsumeAndGetReply(long userId, long chatId, string[] args,
