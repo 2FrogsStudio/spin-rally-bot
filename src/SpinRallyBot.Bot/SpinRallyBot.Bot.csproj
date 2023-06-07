@@ -17,4 +17,8 @@
         <ProjectReference Include="..\SpinRallyBot.Utils\SpinRallyBot.Utils.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="Commands\AddPlayerToDb.cs" />
+    </ItemGroup>
+
 </Project>

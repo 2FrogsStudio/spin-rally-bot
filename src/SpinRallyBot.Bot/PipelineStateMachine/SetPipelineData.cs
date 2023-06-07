@@ -24,17 +24,10 @@ public class SetPipelineDataConsumer : IMediatorConsumer<SetPipelineData> {
 
         entity.Data = JsonSerializer.Serialize(pipelineState.Data);
 
-        switch (_db.Entry(entity).State) {
-            case EntityState.Unchanged:
-                return;
-            case EntityState.Detached:
-                _db.PipelineState.Add(entity);
-                break;
-            case EntityState.Modified:
-                _db.PipelineState.Update(entity);
-                break;
+        if (_db.Entry(entity).State is EntityState.Detached) {
+            _db.Add(entity);
         }
 
-        await _db.SaveChangesAsync(cancellationToken);
+        await _db.SaveChangesAsync(context.CancellationToken);
     }
 }

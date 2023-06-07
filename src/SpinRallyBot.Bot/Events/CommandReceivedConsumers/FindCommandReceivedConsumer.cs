@@ -16,30 +16,16 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
         while (true)
             switch (args) {
                 case [{ } url, ..] when TryGetPlayerUrlAndId(url, out var playerUrl, out var playerId):
-                    var result = await _mediator
-                        .CreateRequestClient<GetCachedPlayerInfo>()
-                        .GetResponse<PlayerInfo, PlayerInfoNotFound>(new GetCachedPlayerInfo(playerUrl),
-                            cancellationToken);
-                    if (result.Is<PlayerInfo>(out var playerInfoResponse) &&
-                        playerInfoResponse.Message is { } player1) {
-                        await PlayerInfo(chatId, player1, cancellationToken);
-                        return;
-                    }
-
-                    if (result.Is<PlayerInfoNotFound>(out _)) {
-                        Text = $"Участник с идентификатором {playerId} не найден".ToEscapedMarkdownV2();
-                        return;
-                    }
-
-                    throw new UnreachableException();
+                    await ComposePlayerInfo(chatId, playerUrl, playerId, cancellationToken);
+                    return;
                 case [{ } search, ..]:
-                    var players = await GetPlayersByName(search, cancellationToken);
+                    var players = await SearchPlayers(search, cancellationToken);
                     switch (players) {
                         case []:
                             Text = "Участники не найдены".ToEscapedMarkdownV2();
                             return;
-                        case [var player2]:
-                            args = new[] { player2.PlayerUrl };
+                        case [var player]:
+                            args = new[] { player.PlayerUrl };
                             continue;
                         default:
                             //todo: pagination
@@ -56,48 +42,64 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
                             InlineKeyboard = playerButtons.Split(1);
                             return;
                     }
-
                 default:
                     Text = CommandHelpers.HelpByCommand[Command.Find];
                     return;
             }
     }
 
-    private async Task PlayerInfo(long chatId, PlayerInfo player, CancellationToken cancellationToken) {
-        var buttons = new List<InlineKeyboardButton>();
-
-        var findSubscriptionResponse = await _mediator
-            .CreateRequestClient<FindSubscription>()
-            .GetResponse<SubscriptionResult, SubscriptionNotFound>(new FindSubscription(chatId, player.PlayerUrl),
+    private async Task ComposePlayerInfo(long chatId, string playerUrl, string playerId,
+        CancellationToken cancellationToken) {
+        var result = await _mediator
+            .CreateRequestClient<GetOrUpdatePlayerInfo>()
+            .GetResponse<PlayerViewModel, PlayerNotFound>(new GetOrUpdatePlayerInfo(playerUrl),
                 cancellationToken);
+        if (result.Is<PlayerViewModel>(out var playerResponse) &&
+            playerResponse.Message is { } player) {
+            var buttons = new List<InlineKeyboardButton>();
 
-        if (findSubscriptionResponse.Is<SubscriptionResult>(out _)) {
-            buttons.Add(new InlineKeyboardButton("Отписаться") {
-                CallbackData =
-                    JsonSerializer.Serialize(new NavigationData.ActionData(Actions.Unsubscribe, player.PlayerUrl))
-            });
+            var findSubscriptionResponse = await _mediator
+                .CreateRequestClient<FindSubscription>()
+                .GetResponse<SubscriptionFound, SubscriptionNotFound>(new FindSubscription(chatId, player.PlayerUrl),
+                    cancellationToken);
+            if (findSubscriptionResponse.Is<SubscriptionFound>(out _)) {
+                buttons.Add(new InlineKeyboardButton("Отписаться") {
+                    CallbackData =
+                        JsonSerializer.Serialize(
+                            new NavigationData.ActionData(Actions.Unsubscribe, player.PlayerUrl))
+                });
+            }
+
+            if (findSubscriptionResponse.Is<SubscriptionNotFound>(out _)) {
+                buttons.Add(new InlineKeyboardButton("Подписаться") {
+                    CallbackData =
+                        JsonSerializer.Serialize(new NavigationData.ActionData(Actions.Subscribe, player.PlayerUrl))
+                });
+            }
+
+            Text =
+                $"{player.Fio}".ToEscapedMarkdownV2() + "\n" +
+                $"Рейтинг: {player.Rating:F}".ToEscapedMarkdownV2() + "\n" +
+                $"Позиция: {player.Position}".ToEscapedMarkdownV2() + "\n" +
+                $"Обновлено: {player.Updated:dd.MM.yyyy h:mm} (МСК)".ToEscapedMarkdownV2();
+            InlineKeyboard = buttons.Split(1);
+            return;
         }
 
-        if (findSubscriptionResponse.Is<SubscriptionNotFound>(out _)) {
-            buttons.Add(new InlineKeyboardButton("Подписаться") {
-                CallbackData =
-                    JsonSerializer.Serialize(new NavigationData.ActionData(Actions.Subscribe, player.PlayerUrl))
-            });
+        if (result.Is<PlayerNotFound>(out _)) {
+            Text = $"Участник с идентификатором {playerId} не найден".ToEscapedMarkdownV2();
+            return;
         }
 
-        Text =
-            $"{player.Fio}\n".ToEscapedMarkdownV2() +
-            $"Рейтинг: {player.Rating:F}\n".ToEscapedMarkdownV2() +
-            $"Позиция: {player.Position}".ToEscapedMarkdownV2();
-        InlineKeyboard = buttons.Split(1);
+        throw new UnreachableException();
     }
 
-    private async Task<Player[]> GetPlayersByName(string search, CancellationToken cancellationToken) {
+    private async Task<(string Fio, string PlayerUrl)[]> SearchPlayers(string search,
+        CancellationToken cancellationToken) {
         var response = await _mediator
-            .CreateRequestClient<GetPlayersByName>()
-            .GetResponse<Player[]>(new GetPlayersByName(search), cancellationToken);
-
-        return response.Message;
+            .CreateRequestClient<SearchPlayers>()
+            .GetResponse<SearchPlayersResult>(new SearchPlayers(search), cancellationToken);
+        return response.Message.Players;
     }
 
     private static bool TryGetPlayerUrlAndId(string url, out string playerUrl, out string playerId) {

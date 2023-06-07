@@ -23,10 +23,10 @@ public class StartCommandConsumer : CommandReceivedConsumerBase {
 
         var subscriptions = (await _mediator
             .CreateRequestClient<GetSubscriptions>()
-            .GetResponse<SubscriptionResult[]>(new GetSubscriptions(chatId), cancellationToken)).Message;
+            .GetResponse<GetSubscriptionsResult>(new GetSubscriptions(chatId), cancellationToken)).Message;
 
-        var playerButtonRows = subscriptions
-            .Select(s => new InlineKeyboardButton(s.Fio) {
+        var playerButtonRows = subscriptions.Subscriptions
+            .Select(s => new InlineKeyboardButton($"{s.Fio} ({s.Rating})") {
                 CallbackData = JsonSerializer.Serialize(new NavigationData.CommandData(Command.Find, s.PlayerUrl))
             }).Split(1).ToArray();
 

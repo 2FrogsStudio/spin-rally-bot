@@ -21,10 +21,10 @@ public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
 
         var cancellationToken = context.CancellationToken;
 
-        var response = await _mediator.CreateRequestClient<GetCachedPlayerInfo>()
-            .GetResponse<PlayerInfo, PlayerInfoNotFound>(new GetCachedPlayerInfo(playerUrl), cancellationToken);
+        var response = await _mediator.CreateRequestClient<GetOrUpdatePlayerInfo>()
+            .GetResponse<PlayerViewModel, PlayerNotFound>(new GetOrUpdatePlayerInfo(playerUrl), cancellationToken);
 
-        if (response.Is<PlayerInfoNotFound>(out _)) {
+        if (response.Is<PlayerNotFound>(out _)) {
             throw new InvalidOperationException("Player not found by Url") {
                 Data = { { "PlayerUrl", playerUrl } }
             };
@@ -34,16 +34,15 @@ public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
             throw new UnreachableException();
         }
 
-        var entity = await _db.Subscriptions.FindAsync(chatId, playerUrl);
-        if (entity is not null) {
-            return;
-        }
+        var entity = await _db.Subscriptions.FindAsync(chatId, playerUrl)
+                     ?? new SubscriptionEntity {
+                         ChatId = chatId,
+                         PlayerUrl = player.PlayerUrl
+                     };
 
-        entity ??= new SubscriptionEntity {
-            ChatId = chatId,
-            PlayerUrl = player.PlayerUrl
-        };
-        _db.Subscriptions.Add(entity);
+        if (_db.Entry(entity).State is EntityState.Detached) {
+            _db.Add(entity);
+        }
 
         await _db.SaveChangesAsync(cancellationToken);
     }

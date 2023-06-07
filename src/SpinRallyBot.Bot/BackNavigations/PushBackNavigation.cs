@@ -35,17 +35,8 @@ public class PushBackNavigationConsumer : IMediatorConsumer<PushBackNavigation> 
 
         entity.Data = JsonSerializer.Serialize(backNavigations);
 
-        switch (_db.Entry(entity).State) {
-            case EntityState.Unchanged:
-                return;
-            case EntityState.Detached:
-                _db.BackNavigations.Add(entity);
-                break;
-            case EntityState.Modified:
-                _db.BackNavigations.Update(entity);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
+        if (_db.Entry(entity).State is EntityState.Detached) {
+            _db.BackNavigations.Add(entity);
         }
 
         await _db.SaveChangesAsync(context.CancellationToken);

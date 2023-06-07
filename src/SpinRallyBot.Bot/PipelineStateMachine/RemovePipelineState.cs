@@ -15,9 +15,11 @@ public class RemovePipelineStateConsumer : IMediatorConsumer<RemovePipelineState
             context.Message.UserId,
             context.Message.ChatId
         }, cancellationToken);
-        if (entity is not null) {
-            _db.PipelineState.Remove(entity);
-            await _db.SaveChangesAsync(cancellationToken);
+        if (entity is null) {
+            return;
         }
+
+        _db.Remove(entity);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 }

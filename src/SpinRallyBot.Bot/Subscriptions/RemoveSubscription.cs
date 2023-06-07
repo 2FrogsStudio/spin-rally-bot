@@ -26,7 +26,7 @@ public class RemoveSubscriptionConsumer : IMediatorConsumer<RemoveSubscription> 
             return;
         }
 
-        _db.Subscriptions.Remove(entity);
+        _db.Remove(entity);
         await _db.SaveChangesAsync(cancellationToken);
     }
 }

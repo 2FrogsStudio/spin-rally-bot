@@ -37,7 +37,6 @@ public class PopBackNavigationConsumer : IMediatorConsumer<PopBackNavigation> {
         }
 
         entity.Data = JsonSerializer.Serialize(list);
-        _db.BackNavigations.Update(entity);
         await _db.SaveChangesAsync(context.CancellationToken);
         await context.RespondAsync(result);
     }
