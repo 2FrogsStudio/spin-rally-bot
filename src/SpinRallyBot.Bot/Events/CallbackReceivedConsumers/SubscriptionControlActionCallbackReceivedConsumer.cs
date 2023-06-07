@@ -12,7 +12,8 @@ public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsum
         if (context.Message is not {
                 Data: NavigationData.ActionData {
                     Action: var action and (Actions.Subscribe or Actions.Unsubscribe),
-                    Data: { } playerUrl
+                    Data: { } playerUrl,
+                    NewThread: var newThread
                 },
                 ChatId: var chatId,
                 MessageId: var messageId,
@@ -37,7 +38,7 @@ public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsum
 
         await _mediator.Send(new CallbackReceived(
             new NavigationData.CommandData(Command.Find, playerUrl),
-            messageId,
+            newThread ? null : messageId,
             chatId,
             UserId: userId,
             ChatType: chatType

@@ -11,7 +11,8 @@ public class CommandCallbackReceivedConsumer : IMediatorConsumer<CallbackReceive
         if (context.Message is not {
                 Data: NavigationData.CommandData {
                     Command: var command,
-                    Data: var data
+                    Data: var data,
+                    NewThread: var newThread
                 },
                 MessageId: var messageId,
                 ChatId: var chatId,
@@ -25,7 +26,8 @@ public class CommandCallbackReceivedConsumer : IMediatorConsumer<CallbackReceive
         // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
         var args = data?.Split(' ') ?? Array.Empty<string>();
 
-        await _mediator.Publish(new CommandReceived(command, args, chatId, chatType, null, messageId, userId),
+        await _mediator.Publish(
+            new CommandReceived(command, args, chatId, chatType, null, newThread ? null : messageId, userId),
             context.CancellationToken);
     }
 }

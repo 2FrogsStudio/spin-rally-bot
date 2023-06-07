@@ -17,14 +17,16 @@ public abstract class NavigationData {
     public class CommandData : NavigationData {
         public CommandData() { }
 
-        public CommandData(Command command, string? data = null) {
+        public CommandData(Command command, string? data = null, bool newThread = false) {
             Command = command;
             Data = data;
+            NewThread = newThread;
         }
 
         [JsonPropertyName("C")] public Command Command { get; init; }
 
         [JsonPropertyName("D")] public string? Data { get; init; }
+        [JsonPropertyName("T")] public bool NewThread { get; init; }
     }
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
@@ -47,14 +49,16 @@ public abstract class NavigationData {
     public class ActionData : NavigationData {
         public ActionData() { }
 
-        public ActionData(Actions action, string? data = null) {
+        public ActionData(Actions action, string? data = null, bool newTread = false) {
             Action = action;
             Data = data;
+            NewThread = newTread;
         }
 
         [JsonPropertyName("A")] public Actions Action { get; init; }
 
         [JsonPropertyName("D")] public string? Data { get; init; }
+        [JsonPropertyName("T")] public bool NewThread { get; init; }
     }
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
