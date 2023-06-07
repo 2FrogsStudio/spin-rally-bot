@@ -2,6 +2,7 @@
 
     <ItemGroup>
         <PackageReference Include="MassTransit.Abstractions" />
+        <PackageReference Include="MassTransit.Quartz" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
         <PackageReference Include="Microsoft.Extensions.Hosting" />
         <PackageReference Include="Microsoft.Extensions.Http" />
@@ -17,8 +18,5 @@
         <ProjectReference Include="..\SpinRallyBot.Utils\SpinRallyBot.Utils.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Compile Remove="Commands\AddPlayerToDb.cs" />
-    </ItemGroup>
 
 </Project>

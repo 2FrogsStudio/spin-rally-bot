@@ -1,6 +1,6 @@
 namespace SpinRallyBot.Queries;
 
-public record GetOrUpdatePlayer(string PlayerUrl);
+public record GetOrUpdatePlayer(string PlayerUrl, bool ForceUpdate = false);
 
 public record GetOrUpdatePlayerResult(
     string PlayerUrl,
@@ -28,10 +28,12 @@ public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer
     public async Task Consume(ConsumeContext<GetOrUpdatePlayer> context) {
         var cancellationToken = context.CancellationToken;
         var playerUrl = context.Message.PlayerUrl;
+        var forceUpdate = context.Message.ForceUpdate;
 
         var entity = await _db.Players.FindAsync(new object[] { playerUrl }, cancellationToken);
         if (entity is null
-            || entity.Updated < DateTimeOffset.UtcNow.AddDays(-1)) {
+            || entity.Updated < DateTimeOffset.UtcNow.AddHours(-4)
+            || forceUpdate) {
             var playerInfo = await _ttwClient.GetPlayerInfo(playerUrl, cancellationToken);
             if (playerInfo is null) {
                 await context.RespondAsync(new GetOrUpdatePlayerNotFoundResult());
@@ -78,7 +80,6 @@ public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer
 
         var oldRating = original.GetValue<float>(nameof(PlayerEntity.Rating));
         var newRating = current.GetValue<float>(nameof(PlayerEntity.Rating));
-
         var oldPosition = original.GetValue<uint>(nameof(PlayerEntity.Position));
         var newPosition = current.GetValue<uint>(nameof(PlayerEntity.Position));
 
