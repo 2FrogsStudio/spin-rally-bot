@@ -1,5 +1,3 @@
-using SpinRallyBot.Events;
-
 namespace SpinRallyBot.Services;
 
 internal class PullingService : BackgroundService {
