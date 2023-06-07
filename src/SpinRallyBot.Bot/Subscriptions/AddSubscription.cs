@@ -21,16 +21,17 @@ public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
 
         var cancellationToken = context.CancellationToken;
 
-        var response = await _mediator.CreateRequestClient<GetOrUpdatePlayerInfo>()
-            .GetResponse<PlayerViewModel, PlayerNotFound>(new GetOrUpdatePlayerInfo(playerUrl), cancellationToken);
+        var response = await _mediator.CreateRequestClient<GetOrUpdatePlayer>()
+            .GetResponse<GetOrUpdatePlayerResult, GetOrUpdatePlayerNotFoundResult>(new GetOrUpdatePlayer(playerUrl),
+                cancellationToken);
 
-        if (response.Is<PlayerNotFound>(out _)) {
+        if (response.Is<GetOrUpdatePlayerNotFoundResult>(out _)) {
             throw new InvalidOperationException("Player not found by Url") {
                 Data = { { "PlayerUrl", playerUrl } }
             };
         }
 
-        if (!response.Is<PlayerInfo>(out var result) || result.Message is not Player player) {
+        if (!response.Is<GetOrUpdatePlayerResult>(out var result) || result.Message is not { } player) {
             throw new UnreachableException();
         }
 

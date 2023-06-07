@@ -51,10 +51,10 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
     private async Task ComposePlayerInfo(long chatId, string playerUrl, string playerId,
         CancellationToken cancellationToken) {
         var result = await _mediator
-            .CreateRequestClient<GetOrUpdatePlayerInfo>()
-            .GetResponse<PlayerViewModel, PlayerNotFound>(new GetOrUpdatePlayerInfo(playerUrl),
+            .CreateRequestClient<GetOrUpdatePlayer>()
+            .GetResponse<GetOrUpdatePlayerResult, GetOrUpdatePlayerNotFoundResult>(new GetOrUpdatePlayer(playerUrl),
                 cancellationToken);
-        if (result.Is<PlayerViewModel>(out var playerResponse) &&
+        if (result.Is<GetOrUpdatePlayerResult>(out var playerResponse) &&
             playerResponse.Message is { } player) {
             var buttons = new List<InlineKeyboardButton>();
 
@@ -86,7 +86,7 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
             return;
         }
 
-        if (result.Is<PlayerNotFound>(out _)) {
+        if (result.Is<GetOrUpdatePlayerNotFoundResult>(out _)) {
             Text = $"Участник с идентификатором {playerId} не найден".ToEscapedMarkdownV2();
             return;
         }

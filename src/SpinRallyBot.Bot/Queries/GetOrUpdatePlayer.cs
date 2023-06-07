@@ -1,10 +1,13 @@
 namespace SpinRallyBot.Queries;
 
-public record GetOrUpdatePlayerInfo(string PlayerUrl);
+public record GetOrUpdatePlayer(string PlayerUrl);
 
-public record PlayerNotFound;
+public record GetOrUpdatePlayerResult(string PlayerUrl, string Fio, float Rating, uint Position,
+    DateTimeOffset Updated);
 
-public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayerInfo> {
+public record GetOrUpdatePlayerNotFoundResult;
+
+public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer> {
     private readonly AppDbContext _db;
     private readonly ITtwClient _ttwClient;
 
@@ -13,7 +16,7 @@ public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer
         _db = db;
     }
 
-    public async Task Consume(ConsumeContext<GetOrUpdatePlayerInfo> context) {
+    public async Task Consume(ConsumeContext<GetOrUpdatePlayer> context) {
         var cancellationToken = context.CancellationToken;
         var playerUrl = context.Message.PlayerUrl;
 
@@ -22,7 +25,7 @@ public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer
             || entity.Updated < DateTimeOffset.UtcNow.AddDays(-1)) {
             var playerInfo = await _ttwClient.GetPlayerInfo(playerUrl, cancellationToken);
             if (playerInfo is null) {
-                await context.RespondAsync(new PlayerNotFound());
+                await context.RespondAsync(new GetOrUpdatePlayerNotFoundResult());
                 return;
             }
 
@@ -39,7 +42,7 @@ public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer
             await _db.SaveChangesAsync(cancellationToken);
         }
 
-        await context.RespondAsync(new PlayerViewModel(
+        await context.RespondAsync(new GetOrUpdatePlayerResult(
             entity.PlayerUrl,
             entity.Fio,
             entity.Rating,
