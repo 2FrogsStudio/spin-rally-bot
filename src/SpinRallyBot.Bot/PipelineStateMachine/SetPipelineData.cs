@@ -1,5 +1,3 @@
-using SpinRallyBot.Models;
-
 namespace SpinRallyBot.PipelineStateMachine;
 
 public record SetPipelineData(long UserId, long ChatId, PipelineData Data);

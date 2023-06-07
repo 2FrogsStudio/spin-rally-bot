@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using SpinRallyBot.Models;
-using SpinRallyBot.Queries;
-
 namespace SpinRallyBot.Subscriptions;
 
 public record AddSubscription(long ChatId, string PlayerUrl);

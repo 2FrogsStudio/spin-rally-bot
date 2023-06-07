@@ -23,11 +23,11 @@ public class PopBackNavigationConsumer : IMediatorConsumer<PopBackNavigation> {
             return;
         }
 
-        var findIndex = query.Guid is not null 
-            ? list.FindIndex(navigation => navigation.Guid == query.Guid) 
+        var findIndex = query.Guid is not null
+            ? list.FindIndex(navigation => navigation.Guid == query.Guid)
             : list.Count - 1;
 
-        if (findIndex == -1 || list[findIndex] is not {} result) {
+        if (findIndex == -1 || list[findIndex] is not { } result) {
             await context.RespondAsync(new EmptyNavigation());
             return;
         }

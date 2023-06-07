@@ -24,6 +24,7 @@ public class CommandCallbackReceivedConsumer : IMediatorConsumer<CallbackReceive
 
         var args = data?.Split(' ') ?? Array.Empty<string>();
 
-        await _mediator.Publish(new CommandReceived(command, args, chatId, chatType, null, messageId, userId), context.CancellationToken);
+        await _mediator.Publish(new CommandReceived(command, args, chatId, chatType, null, messageId, userId),
+            context.CancellationToken);
     }
 }

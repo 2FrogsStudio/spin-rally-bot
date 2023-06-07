@@ -17,12 +17,12 @@ public class GetBackNavigationListConsumer : IMediatorConsumer<GetBackNavigation
         var entity = await _db.BackNavigations.FindAsync(query.UserId, query.ChatId);
 
         if (string.IsNullOrEmpty(entity?.Data)
-            || JsonSerializer.Deserialize<List<BackNavigations.BackNavigation>>(entity.Data) is not { } list) {
+            || JsonSerializer.Deserialize<List<BackNavigation>>(entity.Data) is not { } list) {
             await context.RespondAsync(new EmptyNavigation());
             return;
         }
 
-        var result = list.Select(n=> new GetBackNavigationResult(n.Name, n.Guid)).Reverse().ToArray();
+        var result = list.Select(n => new GetBackNavigationResult(n.Name, n.Guid)).Reverse().ToArray();
         await context.RespondAsync(result);
     }
 }

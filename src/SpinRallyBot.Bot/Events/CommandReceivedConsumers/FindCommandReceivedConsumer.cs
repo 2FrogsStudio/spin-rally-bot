@@ -1,29 +1,27 @@
-using System.Diagnostics;
 using System.Web;
-using SpinRallyBot.Events.CommandReceivedConsumers.Base;
-using SpinRallyBot.Models;
-using SpinRallyBot.Queries;
-using SpinRallyBot.Subscriptions;
-using SpinRallyBot.Utils;
 
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
 public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
     private readonly IScopedMediator _mediator;
 
-    public FindCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache, IScopedMediator mediator) :
+    public FindCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache,
+        IScopedMediator mediator) :
         base(Command.Find, botClient, memoryCache, mediator) {
         _mediator = mediator;
     }
 
-    protected override async Task ConsumeAndGetReply(long userId, long chatId, string[] args, CancellationToken cancellationToken) {
+    protected override async Task ConsumeAndGetReply(long userId, long chatId, string[] args,
+        CancellationToken cancellationToken) {
         while (true)
             switch (args) {
                 case [{ } url, ..] when TryGetPlayerUrlAndId(url, out var playerUrl, out var playerId):
                     var result = await _mediator
                         .CreateRequestClient<GetCachedPlayerInfo>()
-                        .GetResponse<PlayerInfo, PlayerInfoNotFound>(new GetCachedPlayerInfo(playerUrl), cancellationToken);
-                    if (result.Is<PlayerInfo>(out var playerInfoResponse) && playerInfoResponse.Message is { } player1) {
+                        .GetResponse<PlayerInfo, PlayerInfoNotFound>(new GetCachedPlayerInfo(playerUrl),
+                            cancellationToken);
+                    if (result.Is<PlayerInfo>(out var playerInfoResponse) &&
+                        playerInfoResponse.Message is { } player1) {
                         await PlayerInfo(chatId, player1, cancellationToken);
                         return;
                     }
@@ -47,7 +45,8 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
                             //todo: pagination
                             var playerButtons = players
                                 .Select(p => {
-                                    var data = JsonSerializer.Serialize(new NavigationData.CommandData(Command.Find, p.PlayerUrl));
+                                    var data = JsonSerializer.Serialize(
+                                        new NavigationData.CommandData(Command.Find, p.PlayerUrl));
                                     return new InlineKeyboardButton(p.Fio) {
                                         CallbackData = data
                                     };
@@ -69,17 +68,20 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
 
         var findSubscriptionResponse = await _mediator
             .CreateRequestClient<FindSubscription>()
-            .GetResponse<SubscriptionResult, SubscriptionNotFound>(new FindSubscription(chatId, player.PlayerUrl), cancellationToken);
+            .GetResponse<SubscriptionResult, SubscriptionNotFound>(new FindSubscription(chatId, player.PlayerUrl),
+                cancellationToken);
 
         if (findSubscriptionResponse.Is<SubscriptionResult>(out _)) {
             buttons.Add(new InlineKeyboardButton("Отписаться") {
-                CallbackData = JsonSerializer.Serialize(new NavigationData.ActionData(Actions.Unsubscribe, player.PlayerUrl))
+                CallbackData =
+                    JsonSerializer.Serialize(new NavigationData.ActionData(Actions.Unsubscribe, player.PlayerUrl))
             });
         }
 
         if (findSubscriptionResponse.Is<SubscriptionNotFound>(out _)) {
             buttons.Add(new InlineKeyboardButton("Подписаться") {
-                CallbackData = JsonSerializer.Serialize(new NavigationData.ActionData(Actions.Subscribe, player.PlayerUrl))
+                CallbackData =
+                    JsonSerializer.Serialize(new NavigationData.ActionData(Actions.Subscribe, player.PlayerUrl))
             });
         }
 

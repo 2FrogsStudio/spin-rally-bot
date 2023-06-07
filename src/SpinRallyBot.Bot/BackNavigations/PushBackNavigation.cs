@@ -21,17 +21,17 @@ public class PushBackNavigationConsumer : IMediatorConsumer<PushBackNavigation> 
         }
 
         var entity = await _db.BackNavigations.FindAsync(userId, chatId)
-                     ?? new Models.BackNavigationEntity {
+                     ?? new BackNavigationEntity {
                          UserId = userId,
                          ChatId = chatId
                      };
 
 
-        var backNavigations = string.IsNullOrEmpty(entity.Data) 
-            ? new List<BackNavigations.BackNavigation>() 
-            : JsonSerializer.Deserialize<List<BackNavigations.BackNavigation>>(entity.Data)!;
-        
-        backNavigations.Add(new BackNavigations.BackNavigation(Guid: guid, Name: name, Data: data));
+        var backNavigations = string.IsNullOrEmpty(entity.Data)
+            ? new List<BackNavigation>()
+            : JsonSerializer.Deserialize<List<BackNavigation>>(entity.Data)!;
+
+        backNavigations.Add(new BackNavigation(guid, name, data));
 
         entity.Data = JsonSerializer.Serialize(backNavigations);
 

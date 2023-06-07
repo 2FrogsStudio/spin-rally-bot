@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using SpinRallyBot.Subscriptions;
-
 namespace SpinRallyBot.Events.CallbackReceivedConsumers;
 
 public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsumer<CallbackReceived> {
@@ -37,11 +34,11 @@ public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsum
             default:
                 throw new UnreachableException();
         }
-        
+
         await _mediator.Send(new CallbackReceived(
-            Data: new NavigationData.CommandData(Command.Find, playerUrl),
-            MessageId: messageId,
-            ChatId: chatId,
+            new NavigationData.CommandData(Command.Find, playerUrl),
+            messageId,
+            chatId,
             UserId: userId,
             ChatType: chatType
         ), cancellationToken);

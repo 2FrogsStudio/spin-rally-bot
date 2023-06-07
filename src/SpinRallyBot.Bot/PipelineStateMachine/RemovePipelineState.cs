@@ -1,5 +1,3 @@
-using SpinRallyBot.Models;
-
 namespace SpinRallyBot.PipelineStateMachine;
 
 public record RemovePipelineState(long UserId, long ChatId);

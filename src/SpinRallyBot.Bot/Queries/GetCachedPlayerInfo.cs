@@ -8,8 +8,8 @@ public record PlayerInfoNotFound;
 
 public class GetCachedPlayerInfoConsumer : IMediatorConsumer<GetCachedPlayerInfo> {
     private readonly IMemoryCache _cache;
-    private readonly ITtwClient _ttwClient;
     private readonly IScopedMediator _mediator;
+    private readonly ITtwClient _ttwClient;
 
     public GetCachedPlayerInfoConsumer(ITtwClient ttwClient, IMemoryCache cache, IScopedMediator mediator) {
         _ttwClient = ttwClient;
@@ -20,7 +20,7 @@ public class GetCachedPlayerInfoConsumer : IMediatorConsumer<GetCachedPlayerInfo
     public async Task Consume(ConsumeContext<GetCachedPlayerInfo> context) {
         var cancellationToken = context.CancellationToken;
         var playerUrl = context.Message.PlayerUrl;
-        
+
         var playerInfo = await _cache.GetOrCreateAsync($"{nameof(GetCachedPlayerInfo)}_{playerUrl}", async entry => {
             entry.SetAbsoluteExpiration(TimeSpan.FromHours(1));
             entry.SetSize(1);

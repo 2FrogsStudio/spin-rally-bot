@@ -1,5 +1,3 @@
-using SpinRallyBot.Utils;
-
 namespace SpinRallyBot.Services;
 
 internal class BotInit : IHostedService {

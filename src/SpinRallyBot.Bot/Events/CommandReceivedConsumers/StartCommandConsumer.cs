@@ -1,9 +1,3 @@
-using SpinRallyBot.BackNavigations;
-using SpinRallyBot.Events.CommandReceivedConsumers.Base;
-using SpinRallyBot.Models;
-using SpinRallyBot.Subscriptions;
-using SpinRallyBot.Utils;
-
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
 public class StartCommandConsumer : CommandReceivedConsumerBase {
@@ -14,7 +8,8 @@ public class StartCommandConsumer : CommandReceivedConsumerBase {
         _mediator = mediator;
     }
 
-    protected override async Task ConsumeAndGetReply(long userId, long chatId, string[] args, CancellationToken cancellationToken) {
+    protected override async Task ConsumeAndGetReply(long userId, long chatId, string[] args,
+        CancellationToken cancellationToken) {
         var commandMenuRows = CommandHelpers.CommandAttributeByCommand
             .Where(pair => pair.Value?.InlineName != null)
             .Select(pair => {

@@ -1,11 +1,10 @@
-using SpinRallyBot.Models;
-
 namespace SpinRallyBot.Commands;
 
 public record AddPlayerToDb(Player Player);
 
-public class AddPlayerToDbConsumer:IMediatorConsumer<AddPlayerToDb> {
+public class AddPlayerToDbConsumer : IMediatorConsumer<AddPlayerToDb> {
     private readonly AppDbContext _db;
+
     public AddPlayerToDbConsumer(AppDbContext db) {
         _db = db;
     }

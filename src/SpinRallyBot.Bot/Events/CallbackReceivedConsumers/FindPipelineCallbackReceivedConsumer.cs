@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using SpinRallyBot.Attributes;
-using SpinRallyBot.PipelineStateMachine;
 
 namespace SpinRallyBot.Events.CallbackReceivedConsumers;
 
@@ -35,7 +33,8 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
             case []:
                 //input player pipeline
                 var arg = Command.Find.GetAttributesOfType<CommandArgAttribute>()[0];
-                await _mediator.Send(new SetPipelineData(userId, chatId, new PipelineData(Pipeline.Find)), cancellationToken);
+                await _mediator.Send(new SetPipelineData(userId, chatId, new PipelineData(Pipeline.Find)),
+                    cancellationToken);
                 await _botClient.SendTextMessageAsync(
                     chatId,
                     arg.Name,
@@ -46,7 +45,9 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
                     }, cancellationToken: cancellationToken);
                 return;
             case [_]:
-                await _mediator.Publish(new CommandReceived(Command.Find, args, chatId, chatType, null, messageId, userId), cancellationToken);
+                await _mediator.Publish(
+                    new CommandReceived(Command.Find, args, chatId, chatType, null, messageId, userId),
+                    cancellationToken);
                 break;
             default:
                 throw new UnreachableException();

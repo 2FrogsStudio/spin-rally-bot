@@ -1,19 +1,21 @@
-using SpinRallyBot.BackNavigations;
-
 namespace SpinRallyBot.Events.CommandReceivedConsumers.Base;
 
 public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandReceived> {
     private readonly ITelegramBotClient _bot;
     private readonly Command _command;
-    private readonly IMemoryCache _memoryCache;
     private readonly IScopedMediator _mediator;
+    private readonly IMemoryCache _memoryCache;
 
-    protected CommandReceivedConsumerBase(Command command, ITelegramBotClient bot, IMemoryCache memoryCache, IScopedMediator mediator) {
+    protected CommandReceivedConsumerBase(Command command, ITelegramBotClient bot, IMemoryCache memoryCache,
+        IScopedMediator mediator) {
         _command = command;
         _bot = bot;
         _memoryCache = memoryCache;
         _mediator = mediator;
     }
+
+    protected string? Text { get; set; }
+    protected IEnumerable<IEnumerable<InlineKeyboardButton>>? InlineKeyboard { get; set; }
 
     public async Task Consume(ConsumeContext<CommandReceived> context) {
         if (context.Message.Command != _command) {
@@ -45,7 +47,8 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
 
         var response = await _mediator
             .CreateRequestClient<GetBackNavigationList>()
-            .GetResponse<GetBackNavigationResult[], EmptyNavigation>(new GetBackNavigationList(userId, chatId), cancellationToken);
+            .GetResponse<GetBackNavigationResult[], EmptyNavigation>(new GetBackNavigationList(userId, chatId),
+                cancellationToken);
 
         if (response.Is<GetBackNavigationResult[]>(out var listResponse)
             && listResponse.Message is { } list) {
@@ -55,13 +58,13 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
 
             InlineKeyboard = InlineKeyboard is null ? backButtons : InlineKeyboard.Union(backButtons);
         }
-        
+
         if (menuMessageId.HasValue) {
             await _bot.EditMessageTextAsync(
                 chatId,
                 menuMessageId.Value,
                 Text,
-                parseMode: ParseMode.MarkdownV2,
+                ParseMode.MarkdownV2,
                 disableWebPagePreview: true,
                 replyMarkup: InlineKeyboard is not null ? new InlineKeyboardMarkup(InlineKeyboard) : null,
                 cancellationToken: cancellationToken
@@ -80,9 +83,6 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
         }
     }
 
-    protected string? Text { get; set; }
-    protected IEnumerable<IEnumerable<InlineKeyboardButton>>? InlineKeyboard { get; set; }
-
     private async Task<bool> IsChatAdmin(long chatId, long userId, CancellationToken cancellationToken) {
         var cache = await _memoryCache.GetOrCreateAsync($"AdminIdsByChatId_{chatId}", async entry => {
             entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
@@ -94,5 +94,6 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
         return cache?.Contains(userId) ?? false;
     }
 
-    protected abstract Task ConsumeAndGetReply(long userId, long chatId, string[] args, CancellationToken cancellationToken);
+    protected abstract Task ConsumeAndGetReply(long userId, long chatId, string[] args,
+        CancellationToken cancellationToken);
 }

@@ -14,10 +14,10 @@ public class ResetBackNavigationConsumer : IMediatorConsumer<ResetBackNavigation
         var chatId = context.Message.ChatId;
 
         var entity = await _db.BackNavigations.FindAsync(userId, chatId)
-                     ?? new Models.BackNavigationEntity { UserId = userId, ChatId = chatId };
+                     ?? new BackNavigationEntity { UserId = userId, ChatId = chatId };
 
-        entity.Data = JsonSerializer.Serialize(new BackNavigations.BackNavigation[] {
-            new(Guid: Guid.NewGuid(), Name: "↩︎ Меню", Data: new NavigationData.CommandData(Command.Start))
+        entity.Data = JsonSerializer.Serialize(new BackNavigation[] {
+            new(Guid.NewGuid(), "↩︎ Меню", new NavigationData.CommandData(Command.Start))
         });
 
         switch (_db.Entry(entity).State) {

@@ -1,7 +1,4 @@
-﻿using SpinRallyBot.Queries;
-using SpinRallyBot.Utils;
-
-namespace SpinRallyBot.Events.UpdateReceivedConsumers;
+﻿namespace SpinRallyBot.Events.UpdateReceivedConsumers;
 
 public class PublishCommandReceivedUpdateReceivedConsumer : IMediatorConsumer<UpdateReceived> {
     private readonly ITelegramBotClient _botClient;
@@ -48,7 +45,8 @@ public class PublishCommandReceivedUpdateReceivedConsumer : IMediatorConsumer<Up
                     .CreateRequestClient<GetBotInfo>()
                     .GetResponse<BotInfo>(new GetBotInfo(), cancellationToken)).Message;
                 if (commandAndUserName[1] != botInfo.Username) {
-                    _logger.LogDebug("Command ignored die to wrong bot username Expected: {ExpectedUserName} Actual: {ActualUserName}",
+                    _logger.LogDebug(
+                        "Command ignored die to wrong bot username Expected: {ExpectedUserName} Actual: {ActualUserName}",
                         botInfo.Username, commandAndUserName[1]);
                     return;
                 }

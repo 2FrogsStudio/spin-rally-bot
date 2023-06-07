@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using SpinRallyBot.BackNavigations;
-using SpinRallyBot.PipelineStateMachine;
-
 namespace SpinRallyBot.Events.UpdateReceivedConsumers;
 
 public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorConsumer<UpdateReceived> {
@@ -46,7 +42,8 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorCo
         args = args?.Append(messageText).ToArray() ?? new[] { messageText };
 
         var navigationData = new NavigationData.PipelineData(pipeline, args);
-        await _mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "≡ Список", navigationData), cancellationToken);
+        await _mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "≡ Список", navigationData),
+            cancellationToken);
         try {
             await _mediator.Publish(new CallbackReceived(
                 MessageId: null,
