@@ -21,7 +21,7 @@ public class RemoveSubscriptionConsumer : IMediatorConsumer<RemoveSubscription> 
 
         var cancellationToken = context.CancellationToken;
 
-        var entity = await _db.Subscriptions.FindAsync(chatId, playerUrl);
+        var entity = await _db.Subscriptions.FindAsync(new object[] { chatId, playerUrl }, cancellationToken);
         if (entity is null) {
             return;
         }

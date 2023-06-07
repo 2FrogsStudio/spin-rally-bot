@@ -31,7 +31,7 @@ namespace SpinRallyBot.Migrations
 
                     b.HasKey("UserId", "ChatId");
 
-                    b.ToTable("BackNavigations");
+                    b.ToTable("BackNavigations", (string)null);
                 });
 
             modelBuilder.Entity("SpinRallyBot.Models.PipelineStateEntity", b =>
@@ -48,7 +48,7 @@ namespace SpinRallyBot.Migrations
 
                     b.HasKey("UserId", "ChatId");
 
-                    b.ToTable("PipelineState");
+                    b.ToTable("PipelineState", (string)null);
                 });
 
             modelBuilder.Entity("SpinRallyBot.Models.PlayerEntity", b =>
@@ -74,7 +74,7 @@ namespace SpinRallyBot.Migrations
 
                     b.HasKey("PlayerUrl");
 
-                    b.ToTable("Players");
+                    b.ToTable("Players", (string)null);
                 });
 
             modelBuilder.Entity("SpinRallyBot.Models.SubscriptionEntity", b =>
@@ -89,7 +89,7 @@ namespace SpinRallyBot.Migrations
 
                     b.HasIndex("PlayerUrl");
 
-                    b.ToTable("Subscriptions");
+                    b.ToTable("Subscriptions", (string)null);
                 });
 
             modelBuilder.Entity("SpinRallyBot.Models.SubscriptionEntity", b =>

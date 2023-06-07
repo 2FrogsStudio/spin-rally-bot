@@ -25,4 +25,14 @@ public abstract class AppDbContext : DbContext {
             }
         }
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        modelBuilder.Entity<PlayerEntity>()
+            .HasMany(e => e.Subscriptions)
+            .WithOne(e => e.Player)
+            .HasForeignKey(e => e.PlayerUrl)
+            .IsRequired();
+
+        base.OnModelCreating(modelBuilder);
+    }
 }

@@ -13,8 +13,10 @@ public class PopBackNavigationConsumer : IMediatorConsumer<PopBackNavigation> {
 
     public async Task Consume(ConsumeContext<PopBackNavigation> context) {
         var query = context.Message;
+        var cancellationToken = context.CancellationToken;
 
-        var entity = await _db.BackNavigations.FindAsync(query.UserId, query.ChatId);
+        var entity =
+            await _db.BackNavigations.FindAsync(new object[] { query.UserId, query.ChatId }, cancellationToken);
 
         if (string.IsNullOrEmpty(entity?.Data)
             || JsonSerializer.Deserialize<List<BackNavigation>>(entity.Data) is not { } list
@@ -37,7 +39,7 @@ public class PopBackNavigationConsumer : IMediatorConsumer<PopBackNavigation> {
         }
 
         entity.Data = JsonSerializer.Serialize(list);
-        await _db.SaveChangesAsync(context.CancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
         await context.RespondAsync(result);
     }
 }

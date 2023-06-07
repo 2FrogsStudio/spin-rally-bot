@@ -13,8 +13,10 @@ public class GetBackNavigationListConsumer : IMediatorConsumer<GetBackNavigation
 
     public async Task Consume(ConsumeContext<GetBackNavigationList> context) {
         var query = context.Message;
+        var cancellationToken = context.CancellationToken;
 
-        var entity = await _db.BackNavigations.FindAsync(query.UserId, query.ChatId);
+        var entity =
+            await _db.BackNavigations.FindAsync(new object[] { query.UserId, query.ChatId }, cancellationToken);
 
         if (string.IsNullOrEmpty(entity?.Data)
             || JsonSerializer.Deserialize<List<BackNavigation>>(entity.Data) is not { } list) {

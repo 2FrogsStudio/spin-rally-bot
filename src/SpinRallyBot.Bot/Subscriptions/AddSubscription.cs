@@ -20,7 +20,6 @@ public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
         }
 
         var cancellationToken = context.CancellationToken;
-
         var response = await _mediator.CreateRequestClient<GetOrUpdatePlayer>()
             .GetResponse<GetOrUpdatePlayerResult, GetOrUpdatePlayerNotFoundResult>(new GetOrUpdatePlayer(playerUrl),
                 cancellationToken);
@@ -35,7 +34,7 @@ public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
             throw new UnreachableException();
         }
 
-        var entity = await _db.Subscriptions.FindAsync(chatId, playerUrl)
+        var entity = await _db.Subscriptions.FindAsync(new object[] { chatId, playerUrl }, cancellationToken)
                      ?? new SubscriptionEntity {
                          ChatId = chatId,
                          PlayerUrl = player.PlayerUrl

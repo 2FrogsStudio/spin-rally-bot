@@ -20,7 +20,9 @@ public class PushBackNavigationConsumer : IMediatorConsumer<PushBackNavigation> 
             return;
         }
 
-        var entity = await _db.BackNavigations.FindAsync(userId, chatId)
+        var cancellationToken = context.CancellationToken;
+
+        var entity = await _db.BackNavigations.FindAsync(new object[] { userId, chatId }, cancellationToken)
                      ?? new BackNavigationEntity {
                          UserId = userId,
                          ChatId = chatId
@@ -39,6 +41,6 @@ public class PushBackNavigationConsumer : IMediatorConsumer<PushBackNavigation> 
             _db.BackNavigations.Add(entity);
         }
 
-        await _db.SaveChangesAsync(context.CancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 }

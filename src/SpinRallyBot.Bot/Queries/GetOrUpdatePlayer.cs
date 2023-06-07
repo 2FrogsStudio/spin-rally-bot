@@ -2,8 +2,14 @@ namespace SpinRallyBot.Queries;
 
 public record GetOrUpdatePlayer(string PlayerUrl);
 
-public record GetOrUpdatePlayerResult(string PlayerUrl, string Fio, float Rating, uint Position,
-    DateTimeOffset Updated);
+public record GetOrUpdatePlayerResult(
+    string PlayerUrl,
+    string Fio,
+    float Rating,
+    uint Position,
+    int Subscribers,
+    DateTimeOffset Updated
+);
 
 public record GetOrUpdatePlayerNotFoundResult;
 
@@ -20,7 +26,7 @@ public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer
         var cancellationToken = context.CancellationToken;
         var playerUrl = context.Message.PlayerUrl;
 
-        var entity = await _db.Players.FindAsync(playerUrl, cancellationToken);
+        var entity = await _db.Players.FindAsync(new object[] { playerUrl }, cancellationToken);
         if (entity is null
             || entity.Updated < DateTimeOffset.UtcNow.AddDays(-1)) {
             var playerInfo = await _ttwClient.GetPlayerInfo(playerUrl, cancellationToken);
@@ -42,11 +48,15 @@ public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer
             await _db.SaveChangesAsync(cancellationToken);
         }
 
+        var subscribers =
+            await _db.Subscriptions.CountAsync(s => s.PlayerUrl == playerUrl, cancellationToken);
+
         await context.RespondAsync(new GetOrUpdatePlayerResult(
             entity.PlayerUrl,
             entity.Fio,
             entity.Rating,
             entity.Position,
+            subscribers,
             TimeZoneInfo.ConvertTime(entity.Updated, Constants.RussianTimeZone)
         ));
     }

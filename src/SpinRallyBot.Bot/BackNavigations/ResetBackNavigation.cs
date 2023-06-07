@@ -13,7 +13,8 @@ public class ResetBackNavigationConsumer : IMediatorConsumer<ResetBackNavigation
         var userId = context.Message.UserId;
         var chatId = context.Message.ChatId;
 
-        var entity = await _db.BackNavigations.FindAsync(userId, chatId)
+        var cancellationToken = context.CancellationToken;
+        var entity = await _db.BackNavigations.FindAsync(new object[] { userId, chatId }, cancellationToken)
                      ?? new BackNavigationEntity { UserId = userId, ChatId = chatId };
 
         entity.Data = JsonSerializer.Serialize(new BackNavigation[] {
@@ -24,6 +25,6 @@ public class ResetBackNavigationConsumer : IMediatorConsumer<ResetBackNavigation
             _db.BackNavigations.Add(entity);
         }
 
-        await _db.SaveChangesAsync(context.CancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 }
