@@ -1,42 +1,30 @@
-namespace SpinRallyBot.Queries;
+namespace SpinRallyBot.Commands;
 
-public record GetOrUpdatePlayer(string PlayerUrl, bool ForceUpdate = false);
+public record UpdatePlayer(string PlayerUrl, bool ForceUpdate = false);
 
-public record GetOrUpdatePlayerResult(
-    string PlayerUrl,
-    string Fio,
-    float Rating,
-    uint Position,
-    int Subscribers,
-    DateTimeOffset Updated
-);
-
-public record GetOrUpdatePlayerNotFoundResult;
-
-public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer> {
+public class UpdatePlayerConsumer : IMediatorConsumer<UpdatePlayer> {
     private readonly IBus _bus;
     private readonly AppDbContext _db;
     private readonly ITtwClient _ttwClient;
 
-    public GetOrUpdatePlayerInfoConsumer(ITtwClient ttwClient, AppDbContext db, IBus bus) {
+    public UpdatePlayerConsumer(ITtwClient ttwClient, AppDbContext db, IBus bus) {
         _ttwClient = ttwClient;
         _db = db;
         _bus = bus;
         _db.ChangeTracker.StateChanged += ChangeTrackerOnStateChanged;
     }
 
-    public async Task Consume(ConsumeContext<GetOrUpdatePlayer> context) {
+    public async Task Consume(ConsumeContext<UpdatePlayer> context) {
         var cancellationToken = context.CancellationToken;
         var playerUrl = context.Message.PlayerUrl;
         var forceUpdate = context.Message.ForceUpdate;
 
         var entity = await _db.Players.FindAsync(new object[] { playerUrl }, cancellationToken);
         if (entity is null
-            || entity.Updated < DateTimeOffset.UtcNow.AddHours(-4)
+            // || entity.Updated < DateTimeOffset.UtcNow.AddDays(-1)
             || forceUpdate) {
             var playerInfo = await _ttwClient.GetPlayerInfo(playerUrl, cancellationToken);
             if (playerInfo is null) {
-                await context.RespondAsync(new GetOrUpdatePlayerNotFoundResult());
                 return;
             }
 
@@ -45,6 +33,7 @@ public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer
             entity.Fio = playerInfo.Fio;
             entity.Rating = playerInfo.Rating;
             entity.Position = playerInfo.Position;
+            // entity.Updated = DateTimeOffset.UtcNow;
 
             if (_db.Entry(entity).State is EntityState.Detached) {
                 _db.Add(entity);
@@ -52,18 +41,6 @@ public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer
 
             await _db.SaveChangesAsync(cancellationToken);
         }
-
-        var subscribers =
-            await _db.Subscriptions.CountAsync(s => s.PlayerUrl == playerUrl, cancellationToken);
-
-        await context.RespondAsync(new GetOrUpdatePlayerResult(
-            entity.PlayerUrl,
-            entity.Fio,
-            entity.Rating,
-            entity.Position,
-            subscribers,
-            TimeZoneInfo.ConvertTime(entity.Updated, Constants.RussianTimeZone)
-        ));
     }
 
     private async void ChangeTrackerOnStateChanged(object? sender, EntityStateChangedEventArgs e) {
@@ -86,8 +63,6 @@ public class GetOrUpdatePlayerInfoConsumer : IMediatorConsumer<GetOrUpdatePlayer
         await _bus.Publish(new PlayerRatingChanged(
             player.PlayerUrl,
             oldRating,
-            newRating,
-            oldPosition,
-            newPosition));
+            oldPosition));
     }
 }

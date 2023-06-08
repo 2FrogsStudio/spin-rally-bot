@@ -1,17 +1,17 @@
 namespace SpinRallyBot.Subscriptions;
 
-public record GetSubscriptions(long ChatId);
+public record GetSubscriptionsByChatId(long ChatId);
 
-public record GetSubscriptionsResult((string Fio, float Rating, string PlayerUrl)[] Subscriptions);
+public record GetSubscriptionsByChatIdResult((string Fio, float Rating, string PlayerUrl)[] Subscriptions);
 
-public class GetSubscriptionsConsumer : IMediatorConsumer<GetSubscriptions> {
+public class GetSubscriptionsByChatIdConsumer : IMediatorConsumer<GetSubscriptionsByChatId> {
     private readonly AppDbContext _db;
 
-    public GetSubscriptionsConsumer(AppDbContext db) {
+    public GetSubscriptionsByChatIdConsumer(AppDbContext db) {
         _db = db;
     }
 
-    public async Task Consume(ConsumeContext<GetSubscriptions> context) {
+    public async Task Consume(ConsumeContext<GetSubscriptionsByChatId> context) {
         var cancellationToken = context.CancellationToken;
 
         var subscriptionEntities = await _db.Subscriptions
@@ -20,7 +20,7 @@ public class GetSubscriptionsConsumer : IMediatorConsumer<GetSubscriptions> {
             .Select(s => new { s.Player.Fio, s.Player.Rating, s.PlayerUrl })
             .ToArrayAsync(cancellationToken);
 
-        await context.RespondAsync(new GetSubscriptionsResult(
+        await context.RespondAsync(new GetSubscriptionsByChatIdResult(
             subscriptionEntities
                 .Select(s => (s.Fio, s.Rating, s.PlayerUrl))
                 .ToArray()

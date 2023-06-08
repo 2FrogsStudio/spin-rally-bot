@@ -15,26 +15,45 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
     public async Task Consume(ConsumeContext<PlayerRatingChanged> context) {
         var subscriptions = await _db.Subscriptions
             .Where(s => s.PlayerUrl == context.Message.PlayerUrl)
-            .Select(s => new { chatId = s.ChatId, fio = s.Player.Fio, playerUrl = s.PlayerUrl })
+            .Select(s => new { chatId = s.ChatId, playerUrl = s.PlayerUrl })
             .ToArrayAsync(context.CancellationToken);
 
-        var tasks = subscriptions
-            .Select(s => SendNotification(s.chatId, s.fio, s.playerUrl, context.Message, context.CancellationToken));
+        var exceptions = new List<Exception>();
 
-        await Task.WhenAll(tasks);
+        foreach (var subscription in subscriptions)
+            try {
+                await SendNotification(subscription.chatId, subscription.playerUrl, context.Message,
+                    context.CancellationToken);
+            } catch (Exception ex) {
+                exceptions.Add(ex);
+            }
+
+        if (exceptions.Count > 0) {
+            throw new AggregateException("Encountered errors while trying to update players.", exceptions);
+        }
     }
 
-    private async Task SendNotification(long chatId, string fio, string playerUrl, PlayerRatingChanged changed,
+    private async Task SendNotification(long chatId, string playerUrl, PlayerRatingChanged changed,
         CancellationToken cancellationToken) {
-        var ratingDelta = changed.NewRating - changed.OldRating;
-        var positionDelta = changed.NewPosition - changed.OldPosition;
+        var result = await _mediator
+            .CreateRequestClient<GetPlayer>()
+            .GetResponse<GetPlayerResult>(new GetPlayer(playerUrl),
+                cancellationToken);
+
+        var player = result.Message;
+
+        var ratingDelta = player.Rating - changed.OldRating;
+        var positionDelta = player.Position - changed.OldPosition;
+
         var text =
             $"{(ratingDelta > 0 ? "📈" : "📉")} Рейтинг обновлен ".ToEscapedMarkdownV2() + '\n' +
-            $"Участник: {fio}".ToEscapedMarkdownV2() + '\n' +
-            $"Рейтинг: {changed.NewRating}({(ratingDelta > 0 ? "+" : null)}{ratingDelta})"
+            $"{player.Fio}".ToEscapedMarkdownV2() + "\n" +
+            $"Рейтинг: {player.Rating}({(ratingDelta > 0 ? "+" : null)}{ratingDelta})"
                 .ToEscapedMarkdownV2() + '\n' +
-            $"Рейтинг: {changed.NewPosition}({(positionDelta > 0 ? "+" : null)}{positionDelta})"
-                .ToEscapedMarkdownV2();
+            $"Позиция: {player.Position}({(positionDelta > 0 ? "+" : null)}{positionDelta})"
+                .ToEscapedMarkdownV2() + '\n' +
+            $"Подписчиков: {player.Subscribers}".ToEscapedMarkdownV2() + "\n" +
+            $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2();
 
         var buttons = new List<InlineKeyboardButton>();
 

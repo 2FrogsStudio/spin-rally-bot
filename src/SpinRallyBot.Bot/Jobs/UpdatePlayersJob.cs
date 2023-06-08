@@ -7,7 +7,9 @@ public record UpdatePlayersJob;
 public class UpdatePlayersJobSchedule : DefaultRecurringSchedule {
     public UpdatePlayersJobSchedule() {
         TimeZoneId = TimeZoneInfo.Utc.Id;
-        CronExpression = "0 0 8-20/4 1/1 * ? *";
+        // todo: pass through configuration
+        CronExpression = "0 0 8-20/4 1/1 * ? *"; // every 4th hour from 8 through 20 
+        // CronExpression = "0 0/1 * 1/1 * ? *";
     }
 }
 
@@ -23,7 +25,8 @@ public class UpdatePlayersJobConsumer : IConsumer<UpdatePlayersJob> {
     public async Task Consume(ConsumeContext<UpdatePlayersJob> context) {
         var cancellationToken = context.CancellationToken;
         var playerUrls = await _db.Players
-            .Where(p => p.Subscriptions.Count > 0)
+            // update all players to get actual info in find dialog too 
+            // .Where(p => p.Subscriptions.Count > 0)
             .Select(p => p.PlayerUrl)
             .ToArrayAsync(cancellationToken);
 
@@ -31,7 +34,7 @@ public class UpdatePlayersJobConsumer : IConsumer<UpdatePlayersJob> {
 
         foreach (var playerUrl in playerUrls)
             try {
-                await _mediator.Send(new GetOrUpdatePlayer(
+                await _mediator.Send(new UpdatePlayer(
                     playerUrl,
                     true
                 ), cancellationToken);

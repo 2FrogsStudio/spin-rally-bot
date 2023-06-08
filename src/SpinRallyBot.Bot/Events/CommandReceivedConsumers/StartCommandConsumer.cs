@@ -22,8 +22,9 @@ public class StartCommandConsumer : CommandReceivedConsumerBase {
             .Split(3);
 
         var subscriptions = (await _mediator
-            .CreateRequestClient<GetSubscriptions>()
-            .GetResponse<GetSubscriptionsResult>(new GetSubscriptions(chatId), cancellationToken)).Message;
+                .CreateRequestClient<GetSubscriptionsByChatId>()
+                .GetResponse<GetSubscriptionsByChatIdResult>(new GetSubscriptionsByChatId(chatId), cancellationToken))
+            .Message;
 
         var playerButtonRows = subscriptions.Subscriptions
             .Select(s => new InlineKeyboardButton($"{s.Fio} ({s.Rating})") {

@@ -1,5 +1,3 @@
-using System.Web;
-
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
 public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
@@ -50,11 +48,13 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
 
     private async Task ComposePlayerInfo(long chatId, string playerUrl, string playerId,
         CancellationToken cancellationToken) {
+        await _mediator.Send(new UpdatePlayer(playerUrl), cancellationToken);
+
         var result = await _mediator
-            .CreateRequestClient<GetOrUpdatePlayer>()
-            .GetResponse<GetOrUpdatePlayerResult, GetOrUpdatePlayerNotFoundResult>(new GetOrUpdatePlayer(playerUrl),
+            .CreateRequestClient<GetPlayer>()
+            .GetResponse<GetPlayerResult, GetPlayerNotFoundResult>(new GetPlayer(playerUrl),
                 cancellationToken);
-        if (result.Is<GetOrUpdatePlayerResult>(out var playerResponse) &&
+        if (result.Is<GetPlayerResult>(out var playerResponse) &&
             playerResponse.Message is { } player) {
             var buttons = new List<InlineKeyboardButton>();
 
@@ -87,7 +87,7 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
             return;
         }
 
-        if (result.Is<GetOrUpdatePlayerNotFoundResult>(out _)) {
+        if (result.Is<GetPlayerNotFoundResult>(out _)) {
             Text = $"Участник с идентификатором {playerId} не найден".ToEscapedMarkdownV2();
             return;
         }
