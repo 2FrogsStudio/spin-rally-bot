@@ -60,9 +60,9 @@ public class PublishCommandReceivedUpdateReceivedConsumer : IMediatorConsumer<Up
             : Command.Unknown;
         var args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : Array.Empty<string>();
 
-        using var commandScope = _logger.BeginScope(new Dictionary<string, string> {
+        using var commandScope = _logger.BeginScope(new Dictionary<string, object> {
             { "Command", command.ToString() },
-            { "Args", string.Join(' ', args) }
+            { "Args", string.Join(",", args) }
         });
 
         if (args is ["help", ..] or [.., "help"]) {

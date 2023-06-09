@@ -11,7 +11,11 @@ internal class UpdateHandler : IUpdateHandler {
 
     public async Task HandleUpdateAsync(ITelegramBotClient _, Update update,
         CancellationToken cancellationToken) {
-        using var updateScope = _logger.BeginScope(update);
+        using var updateIdScope = _logger.BeginScope(new Dictionary<string, object> {
+            { "UpdateId", update.Id.ToString() },
+            { "UpdateType", update.Type.ToString() }
+        });
+
         _logger.LogDebug("Update received: {@Update}", update);
 
         await using var scope = _serviceProvider.CreateAsyncScope();
