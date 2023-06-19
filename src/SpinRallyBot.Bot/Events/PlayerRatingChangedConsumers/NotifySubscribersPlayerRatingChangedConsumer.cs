@@ -48,7 +48,7 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
         var text =
             $"{(ratingDelta > 0 ? "📈" : "📉")} Рейтинг обновлен ".ToEscapedMarkdownV2() + '\n' +
             $"{player.Fio}".ToEscapedMarkdownV2() + "\n" +
-            $"Рейтинг: {player.Rating}({(ratingDelta > 0 ? "+" : null)}{ratingDelta})"
+            $"Рейтинг: {player.Rating}({(ratingDelta > 0 ? "+" : null)}{ratingDelta:F2})"
                 .ToEscapedMarkdownV2() + '\n' +
             $"Позиция: {player.Position}({(positionDelta > 0 ? "+" : null)}{positionDelta})"
                 .ToEscapedMarkdownV2() + '\n' +
