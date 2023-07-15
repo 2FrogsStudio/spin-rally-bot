@@ -7,10 +7,11 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
     private readonly IScopedMediator _mediator;
 
     public NotifySubscribersPlayerRatingChangedConsumer(AppDbContext db, ITelegramBotClient bot,
-        IScopedMediator mediator) {
+        IScopedMediator mediator, ILogger<NotifySubscribersPlayerRatingChangedConsumer> logger) {
         _db = db;
         _bot = bot;
         _mediator = mediator;
+        _logger = logger;
     }
 
     public async Task Consume(ConsumeContext<PlayerRatingChanged> context) {
@@ -45,6 +46,10 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
 
         var ratingDelta = player.Rating - changed.OldRating;
         var positionDelta = player.Position - changed.OldPosition;
+
+        _logger.LogInformation(
+            "Player's rating updated: OldRating:{OldRating} NewRating:{NewRating} OldPosition:{OldPosition} NewPosition:{NewPosition}",
+            changed.OldRating, player.Rating, changed.OldPosition, player.Position);
 
         var text =
             $"{(ratingDelta > 0 ? "🚀" : "🔻")} Рейтинг обновлен ".ToEscapedMarkdownV2() + '\n' +
