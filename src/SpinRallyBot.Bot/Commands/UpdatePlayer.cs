@@ -47,8 +47,7 @@ public class UpdatePlayerConsumer : IMediatorConsumer<UpdatePlayer> {
         if (e is not {
                 Entry: {
                     Entity: PlayerEntity player,
-                    OriginalValues: { } original,
-                    CurrentValues: { } current
+                    OriginalValues: { } original
                 },
                 NewState: EntityState.Modified
             }) {
@@ -56,9 +55,7 @@ public class UpdatePlayerConsumer : IMediatorConsumer<UpdatePlayer> {
         }
 
         var oldRating = original.GetValue<float>(nameof(PlayerEntity.Rating));
-        var newRating = current.GetValue<float>(nameof(PlayerEntity.Rating));
         var oldPosition = original.GetValue<uint>(nameof(PlayerEntity.Position));
-        var newPosition = current.GetValue<uint>(nameof(PlayerEntity.Position));
 
         await _bus.Publish(new PlayerRatingChanged(
             player.PlayerUrl,

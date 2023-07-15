@@ -3,6 +3,7 @@ namespace SpinRallyBot.Events.PlayerRatingChangedConsumers;
 public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRatingChanged> {
     private readonly ITelegramBotClient _bot;
     private readonly AppDbContext _db;
+    private readonly ILogger<NotifySubscribersPlayerRatingChangedConsumer> _logger;
     private readonly IScopedMediator _mediator;
 
     public NotifySubscribersPlayerRatingChangedConsumer(AppDbContext db, ITelegramBotClient bot,
@@ -46,7 +47,7 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
         var positionDelta = player.Position - changed.OldPosition;
 
         var text =
-            $"{(ratingDelta > 0 ? "📈" : "📉")} Рейтинг обновлен ".ToEscapedMarkdownV2() + '\n' +
+            $"{(ratingDelta > 0 ? "🚀" : "🔻")} Рейтинг обновлен ".ToEscapedMarkdownV2() + '\n' +
             $"{player.Fio}".ToEscapedMarkdownV2() + "\n" +
             $"Рейтинг: {player.Rating}({(ratingDelta > 0 ? "+" : null)}{ratingDelta:F2})"
                 .ToEscapedMarkdownV2() + '\n' +
