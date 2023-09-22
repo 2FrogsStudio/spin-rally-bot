@@ -50,7 +50,7 @@ jobs:
       - name: Build image
         working-directory: src
         env:
-          ContainerImageName: ${{ env.CONTAINER_IMAGE_NAME }}
+          ContainerRepository: ${{ env.CONTAINER_IMAGE_NAME }}
           ContainerImageTags: ${{ github.sha }}-${{ matrix.arch }}
         run: |
           dotnet publish SpinRallyBot --os linux --arch ${{ matrix.arch }} /t:PublishContainer -c Release

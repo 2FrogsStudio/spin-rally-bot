@@ -5,12 +5,12 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <ContainerImageName>2frogsstudio/spin-rally-bot</ContainerImageName>
+        <ContainerRepository>2frogsstudio/spin-rally-bot</ContainerRepository>
         <ContainerImageTags Condition="$(ContainerImageTags) == ''">latest</ContainerImageTags>
     </PropertyGroup>
 
     <ItemGroup>
-        <ContainerLabel Include="org.opencontainers.image.source" Value="https://github.com/$(ContainerImageName)" />
+        <ContainerLabel Include="org.opencontainers.image.source" Value="https://github.com/$(ContainerRepository)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -22,7 +22,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-        <PackageReference Include="Microsoft.NET.Build.Containers" />
         <PackageReference Include="Sentry.Extensions.Logging" />
         <PackageReference Include="Serilog.Enrichers.Environment" />
         <PackageReference Include="Serilog.Extensions.Hosting" />
