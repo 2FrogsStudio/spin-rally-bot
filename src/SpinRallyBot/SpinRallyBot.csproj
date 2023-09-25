@@ -22,6 +22,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+        <PackageReference Include="Microsoft.NET.Build.Containers" />
         <PackageReference Include="Sentry.Extensions.Logging" />
         <PackageReference Include="Serilog.Enrichers.Environment" />
         <PackageReference Include="Serilog.Extensions.Hosting" />
