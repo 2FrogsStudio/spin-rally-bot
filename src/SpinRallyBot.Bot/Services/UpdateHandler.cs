@@ -1,3 +1,5 @@
+using Telegram.Bot.Exceptions;
+
 namespace SpinRallyBot.Services;
 
 internal class UpdateHandler : IUpdateHandler {
@@ -30,7 +32,7 @@ internal class UpdateHandler : IUpdateHandler {
     public async Task HandlePollingErrorAsync(ITelegramBotClient _, Exception exception,
         CancellationToken cancellationToken) {
         _logger.LogError(exception, "Telegram API Error");
-        if (exception is RequestException) {
+        if (exception is ApiRequestException) {
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
         }
     }
