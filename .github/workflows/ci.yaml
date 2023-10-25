@@ -24,7 +24,7 @@ jobs:
       matrix:
         arch: [ x64, arm64 ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v3
 
       - name: Get Cache Month
