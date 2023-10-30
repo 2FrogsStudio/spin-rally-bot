@@ -1,4 +1,5 @@
 using Quartz;
+using SpinRallyBot.Events.PlayerRatingChangedConsumers;
 using SpinRallyBot.Events.PullingServiceActivatedConsumers;
 using SpinRallyBot.Events.UpdateReceivedConsumers;
 using SpinRallyBot.Serilog;
@@ -31,7 +32,8 @@ public static class HostApplicationBuilderExtensions {
             .AddMassTransit(x => {
                 x.AddQuartzConsumers();
                 x.AddConsumers(type => !type.IsAssignableToGenericType(typeof(IMediatorConsumer<>)),
-                    typeof(ShutdownApplicationPullingServiceActivatedConsumer).Assembly);
+                    typeof(ShutdownApplicationPullingServiceActivatedConsumer).Assembly,
+                    typeof(PublishCommandReceivedUpdateReceivedConsumer).Assembly);
                 if (builder.Configuration["AMQP_URI"] is { } amqpUri) {
                     x.UsingRabbitMq((context, cfg) => {
                         cfg.Host(amqpUri);
@@ -43,7 +45,7 @@ public static class HostApplicationBuilderExtensions {
             })
             .AddMediator(x => {
                 x.AddConsumers(type => type.IsAssignableToGenericType(typeof(IMediatorConsumer<>)),
-                    typeof(PublishCommandReceivedUpdateReceivedConsumer).Assembly);
+                    typeof(NotifySubscribersPlayerRatingChangedConsumer).Assembly);
             });
         return builder;
     }

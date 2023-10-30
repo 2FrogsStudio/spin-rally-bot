@@ -1,6 +1,6 @@
 ﻿namespace SpinRallyBot.Events.UpdateReceivedConsumers;
 
-public class PublishCommandReceivedUpdateReceivedConsumer : IMediatorConsumer<UpdateReceived> {
+public class PublishCommandReceivedUpdateReceivedConsumer : IConsumer<UpdateReceived> {
     private readonly ITelegramBotClient _botClient;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly ILogger<PublishCommandReceivedUpdateReceivedConsumer> _logger;
