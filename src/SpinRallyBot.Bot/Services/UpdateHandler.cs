@@ -21,9 +21,9 @@ internal class UpdateHandler : IUpdateHandler {
         _logger.LogDebug("Update received: {@Update}", update);
 
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();
+        var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
         try {
-            await mediator.Publish(new UpdateReceived(update), cancellationToken);
+            await publishEndpoint.Publish(new UpdateReceived(update), cancellationToken);
         } catch (Exception ex) {
             _logger.LogError(ex, "UpdateReceived failed: {@Update}", update);
         }

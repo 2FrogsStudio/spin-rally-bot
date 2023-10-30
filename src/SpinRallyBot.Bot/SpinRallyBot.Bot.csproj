@@ -2,6 +2,7 @@
 
     <ItemGroup>
         <PackageReference Include="MassTransit.Abstractions" />
+        <PackageReference Include="MassTransit.Newtonsoft" />
         <PackageReference Include="MassTransit.Quartz" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
         <PackageReference Include="Microsoft.Extensions.Hosting" />

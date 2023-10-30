@@ -1,6 +1,6 @@
 namespace SpinRallyBot.Events.UpdateReceivedConsumers;
 
-public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IMediatorConsumer<UpdateReceived> {
+public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IConsumer<UpdateReceived> {
     private readonly IScopedMediator _mediator;
 
     public PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediator mediator) {

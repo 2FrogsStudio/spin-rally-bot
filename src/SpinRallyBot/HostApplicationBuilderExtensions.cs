@@ -1,7 +1,9 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Quartz;
-using SpinRallyBot.Events.PullingServiceActivatedConsumers;
-using SpinRallyBot.Events.UpdateReceivedConsumers;
+using SpinRallyBot.Events.PlayerRatingChangedConsumers;
 using SpinRallyBot.Serilog;
+using SpinRallyBot.Subscriptions;
 
 namespace SpinRallyBot;
 
@@ -31,21 +33,38 @@ public static class HostApplicationBuilderExtensions {
             .AddMassTransit(x => {
                 x.AddQuartzConsumers();
                 x.AddConsumers(type => !type.IsAssignableToGenericType(typeof(IMediatorConsumer<>)),
-                    typeof(ShutdownApplicationPullingServiceActivatedConsumer).Assembly);
+                    typeof(AddSubscriptionConsumer).Assembly);
                 if (builder.Configuration["AMQP_URI"] is { } amqpUri) {
                     x.UsingRabbitMq((context, cfg) => {
                         cfg.Host(amqpUri);
+                        ConfigureNewtonsoft(cfg);
                         cfg.ConfigureEndpoints(context);
                     });
                 } else {
-                    x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
+                    x.UsingInMemory((context, cfg) => {
+                        ConfigureNewtonsoft(cfg);
+                        cfg.ConfigureEndpoints(context);
+                    });
                 }
             })
             .AddMediator(x => {
                 x.AddConsumers(type => type.IsAssignableToGenericType(typeof(IMediatorConsumer<>)),
-                    typeof(PublishCommandReceivedUpdateReceivedConsumer).Assembly);
+                    typeof(NotifySubscribersPlayerRatingChangedConsumer).Assembly);
             });
         return builder;
+    }
+
+    private static void ConfigureNewtonsoft(IBusFactoryConfigurator cfg) {
+        cfg.UseNewtonsoftJsonSerializer();
+        cfg.ConfigureNewtonsoftJsonSerializer(_ => new JsonSerializerSettings {
+            NullValueHandling = NullValueHandling.Include,
+            ContractResolver = new CamelCasePropertyNamesContractResolver {
+                IgnoreSerializableAttribute = true,
+                IgnoreShouldSerializeMembers = true
+            },
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
+        });
     }
 
     public static HostApplicationBuilder AddQuartz(this HostApplicationBuilder builder) {
