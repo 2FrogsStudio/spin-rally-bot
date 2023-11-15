@@ -33,10 +33,17 @@ jobs:
           AMQP_URI=${{ secrets.AMQP_URI }}
           EOT
 
+      - name: Nx set SHAs
+        id: setSHAs
+        uses: nrwl/nx-set-shas@v4.0.1
+        with:
+          workflow-id: ci.yaml
+          set-environment-variables-for-job: false
+
       - name: Run app
         working-directory: ${{ env.HOSTING_PATH }}
         run: |
-          TAG=${{ github.sha }} docker compose up --pull=always
+          TAG=${{ steps.setSHAs.outputs.base }} docker compose up --pull=always
 
       - name: Logs to artifact
         if: always()
