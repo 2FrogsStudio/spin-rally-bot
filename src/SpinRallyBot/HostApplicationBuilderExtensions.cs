@@ -69,7 +69,6 @@ public static class HostApplicationBuilderExtensions {
 
     public static HostApplicationBuilder AddQuartz(this HostApplicationBuilder builder) {
         builder.Services.AddQuartz(q => {
-            q.UseMicrosoftDependencyInjectionJobFactory();
             q.UsePersistentStore(s => {
                 var provider = builder.Configuration.GetValue("Provider", "Postgres");
                 switch (provider) {
@@ -86,7 +85,7 @@ public static class HostApplicationBuilderExtensions {
                         throw new Exception($"Unsupported provider: {provider}");
                 }
 
-                s.UseJsonSerializer();
+                s.UseNewtonsoftJsonSerializer();
             });
         });
         return builder;
