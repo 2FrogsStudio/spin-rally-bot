@@ -45,7 +45,9 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
         var player = result.Message;
 
         var ratingDelta = player.Rating - changed.OldRating;
-        var positionDelta = player.Position - changed.OldPosition;
+        var positionDelta = player.Position > changed.OldPosition
+            ? $"+{player.Position - changed.OldPosition}"
+            : $"-{changed.OldPosition - player.Position}";
 
         _logger.LogInformation(
             "Player's rating updated: OldRating:{OldRating} NewRating:{NewRating} OldPosition:{OldPosition} NewPosition:{NewPosition}",
@@ -56,7 +58,7 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
             $"{player.Fio}".ToEscapedMarkdownV2() + "\n" +
             $"Рейтинг: {player.Rating}({(ratingDelta > 0 ? "+" : null)}{ratingDelta:F2})"
                 .ToEscapedMarkdownV2() + '\n' +
-            $"Позиция: {player.Position}({(positionDelta > 0 ? "+" : null)}{positionDelta})"
+            $"Позиция: {player.Position}({positionDelta})"
                 .ToEscapedMarkdownV2() + '\n' +
             $"Подписчиков: {player.Subscribers}".ToEscapedMarkdownV2() + "\n" +
             $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2();
