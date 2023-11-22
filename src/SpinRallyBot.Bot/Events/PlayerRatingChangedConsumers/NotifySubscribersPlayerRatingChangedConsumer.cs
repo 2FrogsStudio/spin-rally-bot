@@ -66,6 +66,7 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
             $"Рейтинг: {ratingDelta}".ToEscapedMarkdownV2() + '\n' +
             $"Позиция: {positionDelta}".ToEscapedMarkdownV2() + '\n' +
             $"Подписчиков: {player.Subscribers}".ToEscapedMarkdownV2() + "\n" +
+            $"TTW: https://r.ttw.ru/{player.PlayerUrl}".ToEscapedMarkdownV2() + "\n" +
             $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2();
 
         var buttons = new List<InlineKeyboardButton>();
