@@ -9,7 +9,10 @@ public static class HostApplicationBuilderExtensions {
         builder.Services.AddSingleton<IHtmlParser, HtmlParser>();
 
         builder.Services.AddHttpClient<ITtwClient, TtwClient>()
-            .ConfigureHttpClient(client => client.BaseAddress = new Uri(Constants.RttwUrl));
+            .ConfigureHttpClient(client => {
+                client.BaseAddress = new Uri(Constants.RttwUrl);
+                client.Timeout = TimeSpan.FromMinutes(5);
+            });
 
         return builder;
     }

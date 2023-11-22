@@ -29,7 +29,14 @@ public class BackActionCallbackReceivedConsumer : IMediatorConsumer<CallbackRece
                 cancellationToken);
 
         if (response.Is<BackNavigation>(out var backResponse) && backResponse.Message.Data is { } data) {
-            await _mediator.Publish(new CallbackReceived(data, messageId, chatId, chatType, userId), cancellationToken);
+            await _mediator.Publish(new CallbackReceived(
+                data,
+                messageId,
+                chatId,
+                chatType,
+                userId,
+                context.Message.IsBotAdmin
+            ), cancellationToken);
         }
     }
 }

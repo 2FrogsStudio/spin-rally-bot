@@ -40,8 +40,9 @@ public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsum
             new NavigationData.CommandData(Command.Find, playerUrl),
             newThread ? null : messageId,
             chatId,
+            chatType,
             UserId: userId,
-            ChatType: chatType
+            context.Message.IsBotAdmin
         ), cancellationToken);
 
 

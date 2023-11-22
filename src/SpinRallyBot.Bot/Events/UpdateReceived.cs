@@ -1,3 +1,3 @@
 namespace SpinRallyBot.Events;
 
-public record UpdateReceived(Update Update);
+public record UpdateReceived(Update Update, bool IsBotAdmin);

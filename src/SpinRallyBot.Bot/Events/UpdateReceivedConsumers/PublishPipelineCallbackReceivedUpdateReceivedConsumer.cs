@@ -1,12 +1,7 @@
 namespace SpinRallyBot.Events.UpdateReceivedConsumers;
 
-public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IConsumer<UpdateReceived> {
-    private readonly IScopedMediator _mediator;
-
-    public PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediator mediator) {
-        _mediator = mediator;
-    }
-
+public class PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediator mediator)
+    : IConsumer<UpdateReceived> {
     public async Task Consume(ConsumeContext<UpdateReceived> context) {
         var update = context.Message.Update;
         var cancellationToken = context.CancellationToken;
@@ -25,7 +20,7 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IConsumer<U
             return;
         }
 
-        var result = await _mediator
+        var result = await mediator
             .CreateRequestClient<GetPipelineData>()
             .GetResponse<PipelineData, NoPipelineStateResult>(new GetPipelineData(userId, chatId), cancellationToken);
 
@@ -42,18 +37,19 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IConsumer<U
         args = args?.Append(messageText).ToArray() ?? new[] { messageText };
 
         var navigationData = new NavigationData.PipelineData(pipeline, args);
-        await _mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "≡ Список", navigationData),
+        await mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "≡ Список", navigationData),
             cancellationToken);
         try {
-            await _mediator.Publish(new CallbackReceived(
-                MessageId: null,
-                Data: navigationData,
-                ChatId: chatId,
-                ChatType: chatType,
-                UserId: userId
+            await mediator.Publish(new CallbackReceived(
+                navigationData,
+                null,
+                chatId,
+                chatType,
+                userId,
+                context.Message.IsBotAdmin
             ), cancellationToken);
         } finally {
-            await _mediator.Send(new RemovePipelineState(userId, chatId), cancellationToken);
+            await mediator.Send(new RemovePipelineState(userId, chatId), cancellationToken);
         }
     }
 }

@@ -7,4 +7,5 @@ public class CommandAttribute : Attribute {
     public string? Description { get; init; }
     public bool IsInitCommand { get; init; } = true;
     public Pipeline Pipeline { get; init; }
+    public bool IsAdminCommand { get; init; }
 }

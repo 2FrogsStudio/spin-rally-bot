@@ -44,8 +44,10 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
 
         var player = result.Message;
 
+        var isIncreased = player.Rating >= changed.OldRating;
+
         var ratingDelta =
-            player.Rating >= changed.OldRating
+            isIncreased
                 ? $"{changed.OldRating:F2} + {player.Rating - changed.OldRating:F2} → {player.Rating:F2}"
                 : $"{changed.OldRating:F2} - {changed.OldRating - player.Rating:F2} → {player.Rating:F2}";
 
@@ -61,13 +63,14 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
             changed.OldRating, player.Rating, changed.OldPosition, player.Position);
 
         var text =
-            $"{(ratingDelta.StartsWith('+') ? "🚀" : "🔻")} Рейтинг обновлен ".ToEscapedMarkdownV2() + '\n' +
+            $"{(isIncreased ? "🚀" : "🔻")} Рейтинг обновлен ".ToEscapedMarkdownV2() + '\n' +
             $"{player.Fio}".ToEscapedMarkdownV2() + "\n" +
             $"Рейтинг: {ratingDelta}".ToEscapedMarkdownV2() + '\n' +
             $"Позиция: {positionDelta}".ToEscapedMarkdownV2() + '\n' +
             $"Подписчиков: {player.Subscribers}".ToEscapedMarkdownV2() + "\n" +
-            $"TTW: https://r.ttw.ru/{player.PlayerUrl}".ToEscapedMarkdownV2() + "\n" +
-            $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2();
+            $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2() + "\n" +
+            $"https://r.ttw.ru/{player.PlayerUrl}".ToEscapedMarkdownV2();
+
 
         var buttons = new List<InlineKeyboardButton>();
 

@@ -6,15 +6,17 @@ namespace SpinRallyBot.Services;
 internal class BotInit : IHostedService {
     private readonly ITelegramBotClient _botClient;
     private readonly IBus _bus;
+    private readonly IHostEnvironment _hostEnvironment;
     private readonly ILogger<BotInit> _logger;
     private readonly ISchedulerFactory _schedulerFactory;
 
     public BotInit(ITelegramBotClient botClient, ILogger<BotInit> logger, IBus bus,
-        ISchedulerFactory schedulerFactory) {
+        ISchedulerFactory schedulerFactory, IHostEnvironment hostEnvironment) {
         _botClient = botClient;
         _logger = logger;
         _bus = bus;
         _schedulerFactory = schedulerFactory;
+        _hostEnvironment = hostEnvironment;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken) {
@@ -28,15 +30,14 @@ internal class BotInit : IHostedService {
     }
 
     private async Task InitUpdaterJob(CancellationToken cancellationToken) {
-        var schedule = new UpdatePlayersJobSchedule();
+        var schedule = new UpdatePlayersJobSchedule(_hostEnvironment.IsDevelopment());
         var currentCron = await GetCurrentCronSchedule(schedule.ScheduleId, schedule.ScheduleGroup, cancellationToken);
 
         if (currentCron != schedule.CronExpression) {
             var sendEndpoint = await _bus.GetSendEndpoint(new Uri("queue:quartz"));
             var formatter = DefaultEndpointNameFormatter.Instance.Consumer<UpdatePlayersJobConsumer>();
             var endpoint = new Uri($"queue:{formatter}");
-            await sendEndpoint.ScheduleRecurringSend(endpoint, schedule, new UpdatePlayersJob(),
-                cancellationToken);
+            await sendEndpoint.ScheduleRecurringSend<UpdatePlayersJob>(endpoint, schedule, new { }, cancellationToken);
         }
     }
 

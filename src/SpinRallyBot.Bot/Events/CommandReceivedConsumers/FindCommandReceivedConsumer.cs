@@ -1,15 +1,12 @@
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
-public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
-    private readonly IScopedMediator _mediator;
+public class FindCommandReceivedConsumer(
+    ITelegramBotClient botClient,
+    IScopedMediator mediator) : CommandReceivedConsumerBase(Command.Find, botClient, mediator) {
+    private readonly IScopedMediator _mediator1 = mediator;
 
-    public FindCommandReceivedConsumer(ITelegramBotClient botClient,
-        IScopedMediator mediator) :
-        base(Command.Find, botClient, mediator) {
-        _mediator = mediator;
-    }
-
-    protected override async Task ConsumeAndGetReply(long userId, long chatId, string[] args,
+    protected override async Task ConsumeAndGetReply(long userId, long chatId, int? replyToMessageId, string[] args,
+        bool isBotAdmin,
         CancellationToken cancellationToken) {
         while (true)
             switch (args) {
@@ -48,9 +45,9 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
 
     private async Task ComposePlayerInfo(long chatId, string playerUrl, string playerId,
         CancellationToken cancellationToken) {
-        await _mediator.Send(new UpdatePlayer(playerUrl), cancellationToken);
+        await _mediator1.Send(new UpdatePlayer(playerUrl), cancellationToken);
 
-        var result = await _mediator
+        var result = await _mediator1
             .CreateRequestClient<GetPlayer>()
             .GetResponse<GetPlayerResult, GetPlayerNotFoundResult>(new GetPlayer(playerUrl),
                 cancellationToken);
@@ -58,7 +55,7 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
             playerResponse.Message is { } player) {
             var buttons = new List<InlineKeyboardButton>();
 
-            var findSubscriptionResponse = await _mediator
+            var findSubscriptionResponse = await _mediator1
                 .CreateRequestClient<FindSubscription>()
                 .GetResponse<SubscriptionFound, SubscriptionNotFound>(new FindSubscription(chatId, player.PlayerUrl),
                     cancellationToken);
@@ -82,8 +79,8 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
                 $"Рейтинг: {player.Rating:F2}".ToEscapedMarkdownV2() + "\n" +
                 $"Позиция: {player.Position}".ToEscapedMarkdownV2() + "\n" +
                 $"Подписчиков: {player.Subscribers}".ToEscapedMarkdownV2() + "\n" +
-                $"TTW: https://r.ttw.ru/{player.PlayerUrl}".ToEscapedMarkdownV2() + "\n" +
-                $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2();
+                $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2() + "\n" +
+                $"https://r.ttw.ru/{player.PlayerUrl}".ToEscapedMarkdownV2();
             InlineKeyboard = buttons.Split(1);
             return;
         }
@@ -98,7 +95,7 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
 
     private async Task<(string Fio, string PlayerUrl)[]> SearchPlayers(string search,
         CancellationToken cancellationToken) {
-        var response = await _mediator
+        var response = await _mediator1
             .CreateRequestClient<SearchPlayers>()
             .GetResponse<SearchPlayersResult>(new SearchPlayers(search), cancellationToken);
         return response.Message.Players;

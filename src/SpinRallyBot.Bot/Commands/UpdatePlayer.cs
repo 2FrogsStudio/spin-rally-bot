@@ -11,7 +11,6 @@ public class UpdatePlayerConsumer : IMediatorConsumer<UpdatePlayer> {
         _ttwClient = ttwClient;
         _db = db;
         _bus = bus;
-        _db.ChangeTracker.StateChanged += ChangeTrackerOnStateChanged;
     }
 
     public async Task Consume(ConsumeContext<UpdatePlayer> context) {
@@ -20,17 +19,20 @@ public class UpdatePlayerConsumer : IMediatorConsumer<UpdatePlayer> {
         var forceUpdate = context.Message.ForceUpdate;
 
         var entity = await _db.Players.FindAsync(new object[] { playerUrl }, cancellationToken);
-        if (entity is null
-            // || entity.Updated < DateTimeOffset.UtcNow.AddDays(-1)
-            || forceUpdate) {
+        if (entity is null || forceUpdate) {
             var playerInfo = await _ttwClient.GetPlayerInfo(playerUrl, cancellationToken);
             if (playerInfo is null) {
                 return;
             }
 
-            // do not update rating with delta less than 0.01
-            if (entity is not null && Math.Abs(entity.Rating - playerInfo.Rating) < 0.01) {
-                return;
+            float? oldRating = null;
+            uint? oldPosition = null;
+            var isRatingChanged = false;
+
+            if (entity is not null) {
+                oldRating = entity.Rating;
+                oldPosition = entity.Position;
+                isRatingChanged = Math.Round(Math.Abs(playerInfo.Rating - oldRating.Value), 2) >= 0.01;
             }
 
             entity ??= new PlayerEntity();
@@ -38,33 +40,21 @@ public class UpdatePlayerConsumer : IMediatorConsumer<UpdatePlayer> {
             entity.Fio = playerInfo.Fio;
             entity.Rating = playerInfo.Rating;
             entity.Position = playerInfo.Position;
-            // entity.Updated = DateTimeOffset.UtcNow;
 
             if (_db.Entry(entity).State is EntityState.Detached) {
                 _db.Add(entity);
             }
 
             await _db.SaveChangesAsync(cancellationToken);
+
+            if (isRatingChanged) {
+                await _bus.Publish(
+                    new PlayerRatingChanged(
+                        playerInfo.PlayerUrl,
+                        oldRating.GetValueOrDefault(),
+                        oldPosition.GetValueOrDefault()
+                    ), cancellationToken);
+            }
         }
-    }
-
-    private async void ChangeTrackerOnStateChanged(object? sender, EntityStateChangedEventArgs e) {
-        if (e is not {
-                Entry: {
-                    Entity: PlayerEntity player,
-                    OriginalValues: { } original
-                },
-                NewState: EntityState.Modified
-            }) {
-            return;
-        }
-
-        var oldRating = original.GetValue<float>(nameof(PlayerEntity.Rating));
-        var oldPosition = original.GetValue<uint>(nameof(PlayerEntity.Position));
-
-        await _bus.Publish(new PlayerRatingChanged(
-            player.PlayerUrl,
-            oldRating,
-            oldPosition));
     }
 }

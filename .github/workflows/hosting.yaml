@@ -28,6 +28,7 @@ jobs:
         run: |
           cat <<EOT > .env
           Bot__Token=${{ secrets.BOT_TOKEN }}
+          Bot__AdminIds=${{ secrets.BOT_ADMIN_IDS }}
           Serilog__WriteTo__Elasticsearch__Args__nodeUris=${{ secrets.SEMATEXT_ELASTICSEARCH_URIS }}
           SENTRY_DSN=${{ secrets.SENTRY_DSN }}
           ConnectionStrings__Postgres=${{ secrets.POSTGRES_CONNECTION_STRING }}

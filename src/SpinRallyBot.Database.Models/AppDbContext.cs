@@ -1,16 +1,12 @@
 namespace SpinRallyBot;
 
-public abstract class AppDbContext : DbContext {
-    protected AppDbContext(DbContextOptions options) : base(options) {
-        SavingChanges += OnSavingChanges;
-    }
-
+public abstract class AppDbContext(DbContextOptions options) : DbContext(options) {
     public DbSet<PipelineStateEntity> PipelineState { get; set; } = null!;
     public DbSet<SubscriptionEntity> Subscriptions { get; set; } = null!;
     public DbSet<BackNavigationEntity> BackNavigations { get; set; } = null!;
     public DbSet<PlayerEntity> Players { get; set; } = null!;
 
-    private void OnSavingChanges(object? sender, SavingChangesEventArgs e) {
+    public override int SaveChanges() {
         var nowLazy = new Lazy<DateTimeOffset>(() => DateTimeOffset.UtcNow);
         foreach (var entry in ChangeTracker.Entries<IDatedEntity>()) {
             var entity = entry.Entity;
@@ -24,6 +20,8 @@ public abstract class AppDbContext : DbContext {
                     break;
             }
         }
+
+        return base.SaveChanges();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {

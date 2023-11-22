@@ -1,14 +1,7 @@
 namespace SpinRallyBot.Events.UpdateReceivedConsumers;
 
-public class PublishCallbackQueryReceivedUpdateReceivedConsumer : IConsumer<UpdateReceived> {
-    private readonly ITelegramBotClient _botClient;
-    private readonly IScopedMediator _mediator;
-
-    public PublishCallbackQueryReceivedUpdateReceivedConsumer(IScopedMediator mediator, ITelegramBotClient botClient) {
-        _mediator = mediator;
-        _botClient = botClient;
-    }
-
+public class PublishCallbackQueryReceivedUpdateReceivedConsumer(IScopedMediator mediator, ITelegramBotClient botClient)
+    : IConsumer<UpdateReceived> {
     public async Task Consume(ConsumeContext<UpdateReceived> context) {
         var update = context.Message.Update;
         if (update is not {
@@ -33,15 +26,16 @@ public class PublishCallbackQueryReceivedUpdateReceivedConsumer : IConsumer<Upda
 
         var navigationData = JsonSerializer.Deserialize<NavigationData>(data)!;
         try {
-            await _mediator.Publish(new CallbackReceived(
-                MessageId: messageId,
+            await mediator.Publish(new CallbackReceived(
                 Data: navigationData,
+                messageId,
                 ChatId: chatId,
                 ChatType: chatType,
-                UserId: userId
+                userId,
+                context.Message.IsBotAdmin
             ), cancellationToken);
         } finally {
-            await _botClient.AnswerCallbackQueryAsync(callbackId, cancellationToken: cancellationToken);
+            await botClient.AnswerCallbackQueryAsync(callbackId, cancellationToken: cancellationToken);
         }
     }
 }

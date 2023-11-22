@@ -28,12 +28,13 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
                 ChatType: var chatType,
                 ReplyToMessageId: var replyToMessageId,
                 MenuMessageId: var menuMessageId,
-                UserId: var userId
+                UserId: var userId,
+                IsBotAdmin: var isBotAdmin
             }) {
             return;
         }
 
-        await ConsumeAndGetReply(userId, chatId, args, cancellationToken);
+        await ConsumeAndGetReply(userId, chatId, replyToMessageId, args, isBotAdmin, cancellationToken);
 
         if (Text is null) {
             return;
@@ -78,6 +79,7 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
         }
     }
 
-    protected abstract Task ConsumeAndGetReply(long userId, long chatId, string[] args,
+    protected abstract Task ConsumeAndGetReply(long userId, long chatId, int? replyToMessageId, string[] args,
+        bool isBotAdmin,
         CancellationToken cancellationToken);
 }

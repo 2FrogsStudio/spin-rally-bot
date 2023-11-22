@@ -25,5 +25,11 @@ public enum Command {
         Text = "/help",
         Description = "Show this help"
     )]
-    Help
+    Help,
+
+    [Command(Text = "/update",
+        Description = "Update job",
+        IsInitCommand = false,
+        IsAdminCommand = true)]
+    Update
 }

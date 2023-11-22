@@ -40,4 +40,8 @@ public static class CommandHelpers {
         var arg = args.SingleOrDefault(a => a.DependsOn.Contains(str))?.Name;
         return arg is null ? str : GetSubArgs(args, $"{str} {arg}");
     }
+
+    public static bool IsAdminCommand(this Command command) {
+        return CommandAttributeByCommand[command]?.IsAdminCommand ?? false;
+    }
 }

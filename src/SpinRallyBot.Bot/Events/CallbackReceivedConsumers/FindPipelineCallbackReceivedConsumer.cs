@@ -46,8 +46,16 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
                 return;
             case [_]:
                 await _mediator.Publish(
-                    new CommandReceived(Command.Find, args, chatId, chatType, null, messageId, userId),
-                    cancellationToken);
+                    new CommandReceived(
+                        Command.Find,
+                        args,
+                        chatId,
+                        chatType,
+                        null,
+                        messageId,
+                        userId,
+                        context.Message.IsBotAdmin
+                    ), cancellationToken);
                 break;
             default:
                 throw new UnreachableException();
