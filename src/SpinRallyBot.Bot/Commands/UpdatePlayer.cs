@@ -28,6 +28,11 @@ public class UpdatePlayerConsumer : IMediatorConsumer<UpdatePlayer> {
                 return;
             }
 
+            // do not update rating with delta less than 0.01
+            if (entity is not null && Math.Abs(entity.Rating - playerInfo.Rating) < 0.01) {
+                return;
+            }
+
             entity ??= new PlayerEntity();
             entity.PlayerUrl = playerUrl;
             entity.Fio = playerInfo.Fio;
