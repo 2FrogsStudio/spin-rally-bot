@@ -79,7 +79,7 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
 
             Text =
                 $"{player.Fio}".ToEscapedMarkdownV2() + "\n" +
-                $"Рейтинг: {player.Rating:F}".ToEscapedMarkdownV2() + "\n" +
+                $"Рейтинг: {player.Rating:F2}".ToEscapedMarkdownV2() + "\n" +
                 $"Позиция: {player.Position}".ToEscapedMarkdownV2() + "\n" +
                 $"Подписчиков: {player.Subscribers}".ToEscapedMarkdownV2() + "\n" +
                 $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2();

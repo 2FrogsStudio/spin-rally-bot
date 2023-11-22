@@ -44,22 +44,27 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
 
         var player = result.Message;
 
-        var ratingDelta = player.Rating - changed.OldRating;
-        var positionDelta = player.Position > changed.OldPosition
-            ? $"+{player.Position - changed.OldPosition}"
-            : $"-{changed.OldPosition - player.Position}";
+        var ratingDelta =
+            player.Rating >= changed.OldRating
+                ? $"{changed.OldRating:F2} + {player.Rating - changed.OldRating:F2} → {player.Rating:F2}"
+                : $"{changed.OldRating:F2} - {changed.OldRating - player.Rating:F2} → {player.Rating:F2}";
+
+        var positionDelta =
+            player.Position >= changed.OldPosition
+                ? player.Position == changed.OldPosition
+                    ? $"{player.Position}"
+                    : $"{changed.OldPosition} + {player.Position - changed.OldPosition} → {player.Position}"
+                : $"{changed.OldPosition} - {changed.OldPosition - player.Position} → {player.Position}";
 
         _logger.LogInformation(
             "Player's rating updated: OldRating:{OldRating} NewRating:{NewRating} OldPosition:{OldPosition} NewPosition:{NewPosition}",
             changed.OldRating, player.Rating, changed.OldPosition, player.Position);
 
         var text =
-            $"{(ratingDelta > 0 ? "🚀" : "🔻")} Рейтинг обновлен ".ToEscapedMarkdownV2() + '\n' +
+            $"{(ratingDelta.StartsWith('+') ? "🚀" : "🔻")} Рейтинг обновлен ".ToEscapedMarkdownV2() + '\n' +
             $"{player.Fio}".ToEscapedMarkdownV2() + "\n" +
-            $"Рейтинг: {player.Rating}({(ratingDelta > 0 ? "+" : null)}{ratingDelta:F2})"
-                .ToEscapedMarkdownV2() + '\n' +
-            $"Позиция: {player.Position}({positionDelta})"
-                .ToEscapedMarkdownV2() + '\n' +
+            $"Рейтинг: {ratingDelta}".ToEscapedMarkdownV2() + '\n' +
+            $"Позиция: {positionDelta}".ToEscapedMarkdownV2() + '\n' +
             $"Подписчиков: {player.Subscribers}".ToEscapedMarkdownV2() + "\n" +
             $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2();
 
