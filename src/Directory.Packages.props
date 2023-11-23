@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="AngleSharp" Version="1.0.6" />
+    <PackageVersion Include="AngleSharp" Version="1.0.7" />
     <PackageVersion Include="coverlet.collector" Version="6.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -34,9 +34,9 @@
     <PackageVersion Include="Microsoft.Extensions.Options" Version="8.0.0" />
     <PackageVersion Include="Microsoft.NET.Build.Containers" Version="8.0.100" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-rc.2" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     <PackageVersion Include="Polly" Version="8.2.0" />
-    <PackageVersion Include="Sentry.Extensions.Logging" Version="3.41.0" />
+    <PackageVersion Include="Sentry.Extensions.Logging" Version="3.41.1" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="2.3.0" />
     <PackageVersion Include="Serilog.Extensions.Hosting" Version="8.0.0" />
     <PackageVersion Include="Serilog.Extensions.Logging" Version="8.0.0" />
@@ -48,10 +48,10 @@
     <PackageVersion Include="Serilog.Sinks.XUnit" Version="3.0.5" />
     <PackageVersion Include="Telegram.Bot" Version="19.0.0" />
     <PackageVersion Include="Telegram.Bot.Extensions.Markup" Version="1.0.2" />
-    <PackageVersion Include="xunit" Version="2.6.1" />
+    <PackageVersion Include="xunit" Version="2.6.2" />
     <PackageVersion Include="Xunit.DependencyInjection" Version="8.9.0" />
     <PackageVersion Include="Xunit.DependencyInjection.Logging" Version="8.1.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3">
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
