@@ -78,6 +78,9 @@ public static class HostApplicationBuilderExtensions {
     public static HostApplicationBuilder AddQuartz(this HostApplicationBuilder builder) {
         builder.Services.AddQuartz(q => {
             q.MisfireThreshold = TimeSpan.FromHours(1);
+            q.SetProperty("quartz.scheduler.idleWaitTime",
+                TimeSpan.FromHours(1).TotalMicroseconds.ToString(CultureInfo.InvariantCulture));
+
             q.UsePersistentStore(s => {
                 var provider = builder.Configuration.GetValue("Provider", "Postgres");
                 switch (provider) {

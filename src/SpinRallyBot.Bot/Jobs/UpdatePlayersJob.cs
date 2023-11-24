@@ -9,8 +9,7 @@ public class UpdatePlayersJobSchedule : DefaultRecurringSchedule {
         TimeZoneId = TimeZoneInfo.Utc.Id;
         // todo: pass through configuration
         CronExpression = "0 0 8-20/4 1/1 * ? *"; // every 4th hour from 8 through 20
-        MisfirePolicy = isDevelopment ? MissedEventPolicy.Skip : MissedEventPolicy.Send;
-        // CronExpression = "0 0/1 * 1/1 * ? *";
+        MisfirePolicy = isDevelopment ? MissedEventPolicy.Skip : MissedEventPolicy.Default;
     }
 }
 
