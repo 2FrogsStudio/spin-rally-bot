@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Quartz;
+using Serilog.Enrichers.Sensitive;
 using SpinRallyBot.Events.PlayerRatingChangedConsumers;
 using SpinRallyBot.Serilog;
 using SpinRallyBot.Subscriptions;
@@ -14,7 +15,14 @@ public static class HostApplicationBuilderExtensions {
             loggingBuilder.ClearProviders();
             loggingBuilder.AddSerilog(new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
-                // .Destructure.With<IncludePublicNotNullFieldsPolicy>()
+                .Enrich.WithSensitiveDataMasking(options => {
+                    options.MaskingOperators.Clear();
+                    options.MaskProperties.Clear();
+                    options.MaskingOperators.Add(
+                        new RegexWithSecretMaskingOperator(@"https:\/\/api.telegram.org\/bot(?'secret'.*?)\/")
+                    );
+                })
+                .Destructure.With<IncludePublicNotNullFieldsPolicy>()
                 .Destructure.With<SerializeJsonElementPolicy>()
                 .CreateLogger());
             loggingBuilder.AddSentry(options => options.Environment = builder.Environment.EnvironmentName);
