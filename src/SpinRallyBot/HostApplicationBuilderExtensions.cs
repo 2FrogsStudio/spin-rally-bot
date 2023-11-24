@@ -79,7 +79,8 @@ public static class HostApplicationBuilderExtensions {
                     case "Postgres":
                         s.UsePostgres(server =>
                             server.ConnectionString = builder.Configuration.GetConnectionString(provider)!);
-                        s.UseClustering();
+                        // disabled die to avoid using active connection of free tier of neon.tech
+                        // s.UseClustering();
                         break;
                     default:
                         throw new Exception($"Unsupported provider: {provider}");
