@@ -46,10 +46,3 @@ jobs:
         working-directory: ${{ env.HOSTING_PATH }}
         run: |
           TAG=${{ steps.setSHAs.outputs.base }} docker compose up --pull=always
-
-      - name: Logs to artifact
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: logs
-          path: .hosting/logs/**
