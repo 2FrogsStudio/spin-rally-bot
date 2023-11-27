@@ -27,10 +27,10 @@ public class PublishCallbackQueryReceivedUpdateReceivedConsumer(IScopedMediator 
         var navigationData = JsonSerializer.Deserialize<NavigationData>(data)!;
         try {
             await mediator.Publish(new CallbackReceived(
-                Data: navigationData,
+                navigationData,
                 messageId,
-                ChatId: chatId,
-                ChatType: chatType,
+                chatId,
+                chatType,
                 userId,
                 context.Message.IsBotAdmin
             ), cancellationToken);

@@ -41,7 +41,7 @@ public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsum
             newThread ? null : messageId,
             chatId,
             chatType,
-            UserId: userId,
+            userId,
             context.Message.IsBotAdmin
         ), cancellationToken);
 
