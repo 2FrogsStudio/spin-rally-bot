@@ -6,8 +6,10 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
     private readonly ILogger<NotifySubscribersPlayerRatingChangedConsumer> _logger;
     private readonly IScopedMediator _mediator;
 
-    public NotifySubscribersPlayerRatingChangedConsumer(AppDbContext db, ITelegramBotClient bot,
-        IScopedMediator mediator, ILogger<NotifySubscribersPlayerRatingChangedConsumer> logger) {
+    public NotifySubscribersPlayerRatingChangedConsumer(AppDbContext db,
+        ITelegramBotClient bot,
+        IScopedMediator mediator,
+        ILogger<NotifySubscribersPlayerRatingChangedConsumer> logger) {
         _db = db;
         _bot = bot;
         _mediator = mediator;
@@ -69,7 +71,7 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
             $"Позиция: {positionDelta}".ToEscapedMarkdownV2() + '\n' +
             $"Подписчиков: {player.Subscribers}".ToEscapedMarkdownV2() + "\n" +
             $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2() + "\n" +
-            $"https://r.ttw.ru/{player.PlayerUrl}".ToEscapedMarkdownV2();
+            $"{Constants.RttwUrl}{player.PlayerUrl}".ToEscapedMarkdownV2();
 
 
         var buttons = new List<InlineKeyboardButton>();

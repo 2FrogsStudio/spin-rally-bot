@@ -1,11 +1,21 @@
 ﻿namespace SpinRallyBot.Events.UpdateReceivedConsumers;
 
-public class PublishCommandReceivedUpdateReceivedConsumer(
-    IScopedMediator mediator,
-    ILogger<PublishCommandReceivedUpdateReceivedConsumer> logger,
-    IHostEnvironment hostEnvironment,
-    ITelegramBotClient botClient)
-    : IConsumer<UpdateReceived> {
+public class PublishCommandReceivedUpdateReceivedConsumer : IConsumer<UpdateReceived> {
+    private readonly ITelegramBotClient _botClient;
+    private readonly IHostEnvironment _hostEnvironment;
+    private readonly ILogger<PublishCommandReceivedUpdateReceivedConsumer> _logger;
+    private readonly IScopedMediator _mediator;
+
+    public PublishCommandReceivedUpdateReceivedConsumer(IScopedMediator mediator,
+        ILogger<PublishCommandReceivedUpdateReceivedConsumer> logger,
+        IHostEnvironment hostEnvironment,
+        ITelegramBotClient botClient) {
+        _mediator = mediator;
+        _logger = logger;
+        _hostEnvironment = hostEnvironment;
+        _botClient = botClient;
+    }
+
     public async Task Consume(ConsumeContext<UpdateReceived> context) {
         var update = context.Message.Update;
         var cancellationToken = context.CancellationToken;
@@ -30,14 +40,14 @@ public class PublishCommandReceivedUpdateReceivedConsumer(
         var commandAndArgs = messageText.Split(' ');
         var commandAndUserName = commandAndArgs[0].Split('@', 2);
         switch (commandAndUserName.Length) {
-            case 1 when update.Message.Chat.Type is not ChatType.Private && hostEnvironment.IsDevelopment():
+            case 1 when update.Message.Chat.Type is not ChatType.Private && _hostEnvironment.IsDevelopment():
                 return;
             case 2: {
-                var botInfo = (await mediator
+                var botInfo = (await _mediator
                     .CreateRequestClient<GetBotInfo>()
                     .GetResponse<BotInfo>(new GetBotInfo(), cancellationToken)).Message;
                 if (commandAndUserName[1] != botInfo.Username) {
-                    logger.LogDebug(
+                    _logger.LogDebug(
                         "Command ignored die to wrong bot username Expected: {ExpectedUserName} Actual: {ActualUserName}",
                         botInfo.Username, commandAndUserName[1]);
                     return;
@@ -50,7 +60,7 @@ public class PublishCommandReceivedUpdateReceivedConsumer(
         var command = CommandHelpers.CommandByText.GetValueOrDefault(commandAndUserName[0], Command.Unknown);
         var args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : Array.Empty<string>();
 
-        using var commandScope = logger.BeginScope(new Dictionary<string, object> {
+        using var commandScope = _logger.BeginScope(new Dictionary<string, object> {
             { "Command", command.ToString() },
             { "Args", string.Join(",", args) }
         });
@@ -58,7 +68,7 @@ public class PublishCommandReceivedUpdateReceivedConsumer(
         if (args is ["help", ..] or [.., "help"]) {
             var help = CommandHelpers.HelpByCommand[command];
             if (help is not null) {
-                await botClient.SendTextMessageAsync(
+                await _botClient.SendTextMessageAsync(
                     chatId,
                     help,
                     parseMode: ParseMode.MarkdownV2,
@@ -71,11 +81,11 @@ public class PublishCommandReceivedUpdateReceivedConsumer(
         }
 
         if (command.IsAdminCommand() && !isBotAdmin) {
-            logger.LogInformation("Called admin command by non-admin user");
+            _logger.LogInformation("Called admin command by non-admin user");
             return;
         }
 
-        await mediator.Publish(new CommandReceived(
+        await _mediator.Publish(new CommandReceived(
             command,
             args,
             chatId,

@@ -6,7 +6,18 @@ public abstract class AppDbContext(DbContextOptions options) : DbContext(options
     public DbSet<BackNavigationEntity> BackNavigations { get; set; } = null!;
     public DbSet<PlayerEntity> Players { get; set; } = null!;
 
-    public override int SaveChanges() {
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = default) {
+        FillDatedEntities();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess) {
+        FillDatedEntities();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    private void FillDatedEntities() {
         var nowLazy = new Lazy<DateTimeOffset>(() => DateTimeOffset.UtcNow);
         foreach (var entry in ChangeTracker.Entries<IDatedEntity>()) {
             var entity = entry.Entity;
@@ -20,8 +31,6 @@ public abstract class AppDbContext(DbContextOptions options) : DbContext(options
                     break;
             }
         }
-
-        return base.SaveChanges();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {

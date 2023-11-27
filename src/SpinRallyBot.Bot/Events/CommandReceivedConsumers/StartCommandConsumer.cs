@@ -1,8 +1,12 @@
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
-public class StartCommandConsumer(ITelegramBotClient botClient, IScopedMediator mediator)
-    : CommandReceivedConsumerBase(Command.Start, botClient, mediator) {
-    private readonly IScopedMediator _mediator1 = mediator;
+public class StartCommandConsumer : CommandReceivedConsumerBase {
+    private readonly IScopedMediator _mediator;
+
+    public StartCommandConsumer(ITelegramBotClient botClient, IScopedMediator mediator) : base(Command.Start, botClient,
+        mediator) {
+        _mediator = mediator;
+    }
 
     protected override async Task ConsumeAndGetReply(long userId, long chatId, int? replyToMessageId, string[] args,
         bool isBotAdmin,
@@ -18,7 +22,7 @@ public class StartCommandConsumer(ITelegramBotClient botClient, IScopedMediator 
             })
             .Split(3);
 
-        var subscriptions = (await _mediator1
+        var subscriptions = (await _mediator
                 .CreateRequestClient<GetSubscriptionsByChatId>()
                 .GetResponse<GetSubscriptionsByChatIdResult>(new GetSubscriptionsByChatId(chatId), cancellationToken))
             .Message;
@@ -30,6 +34,6 @@ public class StartCommandConsumer(ITelegramBotClient botClient, IScopedMediator 
 
         Text = "Главное меню";
         InlineKeyboard = playerButtonRows.Union(commandMenuRows);
-        await _mediator1.Send(new ResetBackNavigation(userId, chatId), cancellationToken);
+        await _mediator.Send(new ResetBackNavigation(userId, chatId), cancellationToken);
     }
 }

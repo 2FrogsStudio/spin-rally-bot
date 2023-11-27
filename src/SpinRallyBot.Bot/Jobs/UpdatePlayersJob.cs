@@ -13,30 +13,41 @@ public class UpdatePlayersJobSchedule : DefaultRecurringSchedule {
     }
 }
 
-public class UpdatePlayersJobConsumer(AppDbContext db, IScopedMediator mediator, ITelegramBotClient bot)
-    : IConsumer<UpdatePlayersJob> {
+public class UpdatePlayersJobConsumer : IConsumer<UpdatePlayersJob> {
+    private readonly ITelegramBotClient _bot;
+    private readonly AppDbContext _db;
+    private readonly IScopedMediator _mediator;
+
+    public UpdatePlayersJobConsumer(AppDbContext db, IScopedMediator mediator, ITelegramBotClient bot) {
+        _db = db;
+        _mediator = mediator;
+        _bot = bot;
+    }
+
     public async Task Consume(ConsumeContext<UpdatePlayersJob> context) {
         var cancellationToken = context.CancellationToken;
-        var playerUrls = await db.Players
+        var playerUrls = await _db.Players
             // update all players to get actual info in find dialog too 
             // .Where(p => p.Subscriptions.Count > 0)
             .Select(p => p.PlayerUrl)
             .ToArrayAsync(cancellationToken);
 
         var exceptions = new List<Exception>();
+        var chatId = context.Headers.Get<uint>("ResponseChatId");
+        var messageId = context.Headers.Get<int>("UpdateMessageId");
 
-        foreach (var playerUrl in playerUrls)
+        for (var index = 0; index < playerUrls.Length; index++) {
+            var playerUrl = playerUrls[index];
             try {
-                await mediator.Send(new UpdatePlayer(
-                    playerUrl,
-                    true
-                ), cancellationToken);
+                await _mediator.Send(new UpdatePlayer(playerUrl, true), cancellationToken);
+                await UpdateProgressMessage(chatId, messageId, index + 1, playerUrls.Length, cancellationToken);
             } catch (Exception ex) {
                 exceptions.Add(ex);
             }
+        }
 
         try {
-            await SendFinishedNotification(context, exceptions.Count > 0, cancellationToken);
+            await FinishedProgressNotification(chatId, messageId, exceptions.Count > 0, cancellationToken);
         } catch (Exception ex) {
             exceptions.Add(ex);
         }
@@ -46,19 +57,29 @@ public class UpdatePlayersJobConsumer(AppDbContext db, IScopedMediator mediator,
         }
     }
 
-    private async Task SendFinishedNotification(MessageContext context, bool failed,
+    private async Task UpdateProgressMessage(uint? chatId, int? messageId, int progress, int count,
         CancellationToken cancellationToken) {
-        var chatId = context.Headers.Get<uint>("RespondChatId");
-        if (chatId is not null) {
-            var replyToMessageId = context.Headers.Get<int>("RespondReplyToMessageId");
-            if (failed) {
-                await bot.SendTextMessageAsync(chatId, "🚨 Update failed, check logs",
-                    replyToMessageId: replyToMessageId, cancellationToken: cancellationToken);
-            } else {
-                await bot.SendTextMessageAsync(chatId, "✅ Update finished",
-                    replyToMessageId: replyToMessageId, cancellationToken: cancellationToken);
-            }
+        if (chatId is null || messageId is null) {
+            return;
         }
+
+        var totalProgress = Math.Round((float)progress / count * 100, 0);
+        await _bot.EditMessageTextAsync(chatId.Value, messageId.Value,
+            $"⏳Обновление {totalProgress}%..".ToEscapedMarkdownV2(), ParseMode.MarkdownV2,
+            cancellationToken: cancellationToken);
+    }
+
+    private async Task FinishedProgressNotification(uint? chatId, int? messageId, bool failed,
+        CancellationToken cancellationToken) {
+        if (chatId is null || messageId is null) {
+            return;
+        }
+
+        var text = failed
+            ? "🚨 Ошибка при обновлении рейтинга, проверьте логи"
+            : "✅ Обновление завершено";
+        await _bot.EditMessageTextAsync(chatId.Value, messageId.Value, text,
+            cancellationToken: cancellationToken);
     }
 }
 

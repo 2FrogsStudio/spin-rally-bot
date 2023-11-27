@@ -1,13 +1,8 @@
-using Microsoft.Extensions.Configuration;
-
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
-public class HelpCommandReceivedConsumer(
-    ITelegramBotClient botClient,
-    IScopedMediator mediator,
-    IConfiguration configuration)
-    : CommandReceivedConsumerBase(Command.Help, botClient, mediator) {
-    private readonly IConfiguration _configuration = configuration;
+public class HelpCommandReceivedConsumer : CommandReceivedConsumerBase {
+    public HelpCommandReceivedConsumer(ITelegramBotClient botClient,
+        IScopedMediator mediator) : base(Command.Help, botClient, mediator) { }
 
     protected override Task ConsumeAndGetReply(long userId, long chatId, int? replyToMessageId, string[] args,
         bool isBotAdmin, CancellationToken cancellationToken) {

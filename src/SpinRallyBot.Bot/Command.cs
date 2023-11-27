@@ -21,15 +21,15 @@ public enum Command {
         "Имя для поиска или ссылка на игрока(https://r.ttw.ru/players/?id=52a31ad)")]
     Find,
 
-    [Command(
-        Text = "/help",
-        Description = "Show this help"
-    )]
-    Help,
-
     [Command(Text = "/update",
-        Description = "Update job",
+        Description = "Обновление",
         IsInitCommand = false,
         IsAdminCommand = true)]
-    Update
+    Update,
+
+    [Command(
+        Text = "/help",
+        Description = "Список доступных команд"
+    )]
+    Help
 }
