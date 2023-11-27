@@ -1,3 +1,5 @@
+using Telegram.Bot.Exceptions;
+
 namespace SpinRallyBot.Events.PlayerRatingChangedConsumers;
 
 public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRatingChanged> {
@@ -28,6 +30,9 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
             try {
                 await SendNotification(subscription.chatId, subscription.playerUrl, context.Message,
                     context.CancellationToken);
+            } catch (ApiRequestException ex) when (ex.ErrorCode is 403 &&
+                                                   ex.Message is "Forbidden: bot was blocked by the user") {
+                await RemoveBannedSubscription(subscription.chatId, context.CancellationToken);
             } catch (Exception ex) {
                 exceptions.Add(ex);
             }
@@ -35,6 +40,12 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
         if (exceptions.Count > 0) {
             throw new AggregateException("Encountered errors while trying to update players.", exceptions);
         }
+    }
+
+    private async Task RemoveBannedSubscription(long chatId, CancellationToken cancellationToken) {
+        var entities = await _db.Subscriptions.Where(s => s.ChatId == chatId).ToArrayAsync(cancellationToken);
+        _db.Subscriptions.RemoveRange(entities);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     private async Task SendNotification(long chatId, string playerUrl, PlayerRatingChanged changed,

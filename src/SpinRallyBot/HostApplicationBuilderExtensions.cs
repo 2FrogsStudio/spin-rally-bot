@@ -22,7 +22,7 @@ public static class HostApplicationBuilderExtensions {
                         new RegexWithSecretMaskingOperator(@"https:\/\/api.telegram.org\/bot(?'secret'.*?)\/")
                     );
                 })
-                .Destructure.With<IncludePublicNotNullFieldsPolicy>()
+                // .Destructure.With<IncludePublicNotNullFieldsPolicy>()
                 .Destructure.With<SerializeJsonElementPolicy>()
                 .CreateLogger());
             loggingBuilder.AddSentry(options => options.Environment = builder.Environment.EnvironmentName);

@@ -6,6 +6,7 @@ public static class HostApplicationBuilderExtensions {
 
         switch (provider) {
             case "Sqlite":
+                Directory.CreateDirectory("App_Data");
                 builder.Services
                     .AddDbContext<AppDbContext, SqliteDbContext>(options =>
                         options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite")));
