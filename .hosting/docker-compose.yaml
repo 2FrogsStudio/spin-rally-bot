@@ -2,6 +2,11 @@ version: '3.4'
 
 services:
   app:
-    image: ghcr.io/2frogsstudio/spin-rally-bot:${TAG:-latest}
+    image: ${IMAGE:-ghcr.io/2frogsstudio/spin-rally-bot}:${TAG:-latest}
     env_file: .env
-    restart: on-failure
+    volumes:
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
+    restart: no
+
+volumes:
+  Data:

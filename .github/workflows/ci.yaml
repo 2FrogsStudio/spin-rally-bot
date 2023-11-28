@@ -80,4 +80,6 @@ jobs:
             archImages+=" ${remoteImage}"
           done
           docker manifest create $REGISTRY/$IMAGE_NAME:${{ github.sha }} $archImages
-          docker manifest push $REGISTRY/$IMAGE_NAME:${{ github.sha }}     
+          docker manifest push $REGISTRY/$IMAGE_NAME:${{ github.sha }}  
+          docker manifest create $REGISTRY/$IMAGE_NAME:latest $archImages
+          docker manifest push $REGISTRY/$IMAGE_NAME:latest

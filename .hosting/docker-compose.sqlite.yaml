@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  app:
+    user: root
+    volumes:
+      - Data:/app/App_Data:rw
+
+volumes:
+  Data:
