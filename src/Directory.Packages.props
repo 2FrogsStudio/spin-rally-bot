@@ -3,7 +3,7 @@
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     </PropertyGroup>
     <ItemGroup>
-        <PackageVersion Include="AngleSharp" Version="1.0.7" />
+        <PackageVersion Include="AngleSharp" Version="1.1.0" />
         <PackageVersion Include="coverlet.collector" Version="6.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -32,10 +32,10 @@
         <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.0" />
         <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
         <PackageVersion Include="Microsoft.Extensions.Options" Version="8.0.0" />
-        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
         <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
         <PackageVersion Include="Polly" Version="8.2.0" />
-        <PackageVersion Include="Sentry.Extensions.Logging" Version="3.41.3" />
+        <PackageVersion Include="Sentry.Extensions.Logging" Version="4.0.3" />
         <PackageVersion Include="Serilog.Enrichers.Environment" Version="2.3.0" />
         <PackageVersion Include="Serilog.Enrichers.Sensitive" Version="1.7.3" />
         <PackageVersion Include="Serilog.Extensions.Hosting" Version="8.0.0" />
