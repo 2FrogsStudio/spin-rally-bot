@@ -1,14 +1,10 @@
 namespace SpinRallyBot.Subscriptions;
 
-public record RemoveSubscription(long ChatId, string PlayerUrl);
-
 public class RemoveSubscriptionConsumer : IMediatorConsumer<RemoveSubscription> {
     private readonly AppDbContext _db;
-    private readonly IScopedMediator _mediator;
 
-    public RemoveSubscriptionConsumer(AppDbContext db, IScopedMediator mediator) {
+    public RemoveSubscriptionConsumer(AppDbContext db) {
         _db = db;
-        _mediator = mediator;
     }
 
     public async Task Consume(ConsumeContext<RemoveSubscription> context) {
@@ -21,7 +17,9 @@ public class RemoveSubscriptionConsumer : IMediatorConsumer<RemoveSubscription> 
 
         var cancellationToken = context.CancellationToken;
 
-        var entity = await _db.Subscriptions.FindAsync(new object[] { chatId, playerUrl }, cancellationToken);
+        var entity = await _db.Subscriptions.FindAsync(new object[] {
+            chatId, playerUrl
+        }, cancellationToken);
         if (entity is null) {
             return;
         }
@@ -30,3 +28,5 @@ public class RemoveSubscriptionConsumer : IMediatorConsumer<RemoveSubscription> 
         await _db.SaveChangesAsync(cancellationToken);
     }
 }
+
+public record RemoveSubscription(long ChatId, string PlayerUrl);
