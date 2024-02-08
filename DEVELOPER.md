@@ -2,6 +2,12 @@
 
 ## Migrations
 
+### Restore tools first
+
+```shell
+dotnet tool restore
+```
+
 ### Add migration
 
 ```shell
