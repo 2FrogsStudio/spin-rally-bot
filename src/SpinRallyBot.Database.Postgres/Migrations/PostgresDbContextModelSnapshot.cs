@@ -18,7 +18,7 @@ namespace SpinRallyBot.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:CollationDefinition:case_insensitive", "en-u-ks-primary,en-u-ks-primary,icu,False")
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -33,7 +33,8 @@ namespace SpinRallyBot.Migrations
 
                     b.Property<string>("Data")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(10000)
+                        .HasColumnType("character varying(10000)");
 
                     b.HasKey("UserId", "ChatId");
 
@@ -50,7 +51,8 @@ namespace SpinRallyBot.Migrations
 
                     b.Property<string>("Data")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(10000)
+                        .HasColumnType("character varying(10000)");
 
                     b.HasKey("UserId", "ChatId");
 
@@ -60,14 +62,16 @@ namespace SpinRallyBot.Migrations
             modelBuilder.Entity("SpinRallyBot.Models.PlayerEntity", b =>
                 {
                     b.Property<string>("PlayerUrl")
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Fio")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<long>("Position")
                         .HasColumnType("bigint");
@@ -89,7 +93,8 @@ namespace SpinRallyBot.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("PlayerUrl")
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("ChatId", "PlayerUrl");
 
