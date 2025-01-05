@@ -3,20 +3,20 @@ namespace SpinRallyBot.Services;
 internal class BotInit : IHostedService {
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<BotInit> _logger;
-    private readonly IScopedMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
-    public BotInit(ITelegramBotClient botClient,
-        ILogger<BotInit> logger,
-        IScopedMediator mediator) {
+    public BotInit(ITelegramBotClient botClient, ILogger<BotInit> logger, IServiceProvider serviceProvider) {
         _botClient = botClient;
         _logger = logger;
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken) {
         _logger.LogInformation("Initialize bot (commands, etc)");
         await InitCommands(cancellationToken);
-        await _mediator.Send(new InitUpdaterJob(false), cancellationToken);
+        await using AsyncServiceScope scope = _serviceProvider.CreateAsyncScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();
+        await mediator.Send(new InitUpdaterJob(false), cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken) {

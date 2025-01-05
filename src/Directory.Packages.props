@@ -15,7 +15,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="MassTransit.Newtonsoft" Version="8.3.3" />
     <PackageVersion Include="MassTransit.Quartz" Version="8.3.4" />
     <PackageVersion Include="MassTransit.RabbitMQ" Version="8.3.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
@@ -33,9 +32,10 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
     <PackageVersion Include="Polly" Version="8.2.0" />
-    <PackageVersion Include="Sentry.Extensions.Logging" Version="4.13.0" />
+    <PackageVersion Include="Quartz.Serialization.SystemTextJson" Version="3.13.1" />
+    <PackageVersion Include="Sentry.Extensions.Logging" Version="5.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageVersion Include="Serilog.Enrichers.Sensitive" Version="1.7.3" />
     <PackageVersion Include="Serilog.Extensions.Hosting" Version="9.0.0" />
@@ -46,8 +46,7 @@
     <PackageVersion Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.XUnit" Version="3.0.5" />
-    <PackageVersion Include="Telegram.Bot" Version="22.2.0" />
-    <PackageVersion Include="Telegram.Bot.Extensions.Markup" Version="1.0.2" />
+    <PackageVersion Include="Telegram.Bot" Version="22.3.0" />
     <PackageVersion Include="xunit" Version="2.9.2" />
     <PackageVersion Include="Xunit.DependencyInjection" Version="8.9.0" />
     <PackageVersion Include="Xunit.DependencyInjection.Logging" Version="8.1.0" />
