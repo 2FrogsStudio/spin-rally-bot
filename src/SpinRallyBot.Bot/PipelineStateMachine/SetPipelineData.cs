@@ -10,17 +10,17 @@ public class SetPipelineDataConsumer : IMediatorConsumer<SetPipelineData> {
     }
 
     public async Task Consume(ConsumeContext<SetPipelineData> context) {
-        var cancellationToken = context.CancellationToken;
-        var pipelineState = context.Message;
+        CancellationToken cancellationToken = context.CancellationToken;
+        SetPipelineData pipelineState = context.Message;
 
-        var entity = await _db.PipelineState.FindAsync(new object[] {
-                         pipelineState.UserId,
-                         pipelineState.ChatId
-                     }, cancellationToken)
-                     ?? new PipelineStateEntity {
-                         UserId = pipelineState.UserId,
-                         ChatId = pipelineState.ChatId
-                     };
+        PipelineStateEntity entity = await _db.PipelineState.FindAsync(new object[] {
+                                         pipelineState.UserId,
+                                         pipelineState.ChatId
+                                     }, cancellationToken)
+                                     ?? new PipelineStateEntity {
+                                         UserId = pipelineState.UserId,
+                                         ChatId = pipelineState.ChatId
+                                     };
 
         entity.Data = JsonSerializer.Serialize(pipelineState.Data);
 

@@ -26,7 +26,7 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
 
         var exceptions = new List<Exception>();
 
-        foreach (var subscription in subscriptions)
+        foreach (var subscription in subscriptions) {
             try {
                 await SendNotification(subscription.chatId, subscription.playerUrl, context.Message,
                     context.CancellationToken);
@@ -36,6 +36,7 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
             } catch (Exception ex) {
                 exceptions.Add(ex);
             }
+        }
 
         if (exceptions.Count > 0) {
             throw new AggregateException("Encountered errors while trying to update players.", exceptions);
@@ -43,28 +44,29 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
     }
 
     private async Task RemoveBannedSubscription(long chatId, CancellationToken cancellationToken) {
-        var entities = await _db.Subscriptions.Where(s => s.ChatId == chatId).ToArrayAsync(cancellationToken);
+        SubscriptionEntity[] entities =
+            await _db.Subscriptions.Where(s => s.ChatId == chatId).ToArrayAsync(cancellationToken);
         _db.Subscriptions.RemoveRange(entities);
         await _db.SaveChangesAsync(cancellationToken);
     }
 
     private async Task SendNotification(long chatId, string playerUrl, PlayerRatingChanged changed,
         CancellationToken cancellationToken) {
-        var result = await _mediator
+        Response<GetPlayerResult> result = await _mediator
             .CreateRequestClient<GetPlayer>()
             .GetResponse<GetPlayerResult>(new GetPlayer(playerUrl),
                 cancellationToken);
 
-        var player = result.Message;
+        GetPlayerResult player = result.Message;
 
-        var isIncreased = player.Rating >= changed.OldRating;
+        bool isIncreased = player.Rating >= changed.OldRating;
 
-        var ratingDelta =
+        string ratingDelta =
             isIncreased
                 ? $"{changed.OldRating:F2} + {player.Rating - changed.OldRating:F2} → {player.Rating:F2}"
                 : $"{changed.OldRating:F2} - {changed.OldRating - player.Rating:F2} → {player.Rating:F2}";
 
-        var positionDelta =
+        string positionDelta =
             player.Position >= changed.OldPosition
                 ? player.Position == changed.OldPosition
                     ? $"{player.Position}"
@@ -75,7 +77,7 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
             "Player's rating updated: OldRating:{OldRating} NewRating:{NewRating} OldPosition:{OldPosition} NewPosition:{NewPosition}",
             changed.OldRating, player.Rating, changed.OldPosition, player.Position);
 
-        var text =
+        string text =
             $"{(isIncreased ? "🚀" : "🔻")} Рейтинг обновлен ".ToEscapedMarkdownV2() + '\n' +
             $"{player.Fio}".ToEscapedMarkdownV2() + "\n" +
             $"Рейтинг: {ratingDelta}".ToEscapedMarkdownV2() + '\n' +
@@ -84,10 +86,9 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
             $"Обновлено: {player.Updated:dd.MM.yyyy H:mm} (МСК)".ToEscapedMarkdownV2() + "\n" +
             $"{Constants.RttwUrl}{player.PlayerUrl}".ToEscapedMarkdownV2();
 
-
         var buttons = new List<InlineKeyboardButton>();
 
-        var findSubscriptionResponse = await _mediator
+        Response<SubscriptionFound, SubscriptionNotFound> findSubscriptionResponse = await _mediator
             .CreateRequestClient<FindSubscription>()
             .GetResponse<SubscriptionFound, SubscriptionNotFound>(new FindSubscription(chatId, playerUrl),
                 cancellationToken);
@@ -110,7 +111,7 @@ public class NotifySubscribersPlayerRatingChangedConsumer : IConsumer<PlayerRati
             CallbackData = JsonSerializer.Serialize(new NavigationData.CommandData(Command.Start, newThread: true))
         });
 
-        await _bot.SendTextMessageAsync(
+        await _bot.SendMessage(
             chatId,
             text,
             parseMode: ParseMode.MarkdownV2,

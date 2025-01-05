@@ -6,7 +6,7 @@ public class UriTryCreateTests {
     [InlineData("/players/?id=52a31ad")]
     public void TestUriTryCreate(string uriString) {
         var baseUri = new Uri(Constants.RttwUrl);
-        if (!Uri.TryCreate(uriString, UriKind.Absolute, out var uri)
+        if (!Uri.TryCreate(uriString, UriKind.Absolute, out Uri? uri)
             || string.IsNullOrWhiteSpace(uri.Host)) {
             uri = new Uri(baseUri, uriString);
         }

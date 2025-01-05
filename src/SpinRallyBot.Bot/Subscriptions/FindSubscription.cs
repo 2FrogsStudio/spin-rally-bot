@@ -14,9 +14,9 @@ public class FindSubscriptionConsumer : IMediatorConsumer<FindSubscription> {
     }
 
     public async Task Consume(ConsumeContext<FindSubscription> context) {
-        var cancellationToken = context.CancellationToken;
+        CancellationToken cancellationToken = context.CancellationToken;
 
-        var subscription =
+        SubscriptionEntity? subscription =
             await _db.Subscriptions.FindAsync(new object[] { context.Message.ChatId, context.Message.PlayerUrl },
                 cancellationToken);
 

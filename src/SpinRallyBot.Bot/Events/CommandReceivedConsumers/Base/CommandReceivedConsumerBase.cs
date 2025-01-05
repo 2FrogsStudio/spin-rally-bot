@@ -20,7 +20,7 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
             return;
         }
 
-        var cancellationToken = context.CancellationToken;
+        CancellationToken cancellationToken = context.CancellationToken;
 
         if (context.Message is not {
                 Args: var args,
@@ -40,14 +40,14 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
             return;
         }
 
-        var response = await _mediator
+        Response<GetBackNavigationResult[], EmptyNavigation> response = await _mediator
             .CreateRequestClient<GetBackNavigationList>()
             .GetResponse<GetBackNavigationResult[], EmptyNavigation>(new GetBackNavigationList(userId, chatId),
                 cancellationToken);
 
-        if (response.Is<GetBackNavigationResult[]>(out var listResponse)
+        if (response.Is<GetBackNavigationResult[]>(out Response<GetBackNavigationResult[]>? listResponse)
             && listResponse.Message is { } list) {
-            var backButtons = list.Select(l => new InlineKeyboardButton(l.Name) {
+            IEnumerable<InlineKeyboardButton[]> backButtons = list.Select(l => new InlineKeyboardButton(l.Name) {
                 CallbackData = JsonSerializer.Serialize(new NavigationData.BackData { Guid = l.Guid })
             }).Split(3);
 
@@ -56,24 +56,24 @@ public abstract class CommandReceivedConsumerBase : IMediatorConsumer<CommandRec
 
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (menuMessageId.HasValue) {
-            await _bot.EditMessageTextAsync(
+            await _bot.EditMessageText(
                 chatId,
                 menuMessageId.Value,
                 Text,
                 ParseMode.MarkdownV2,
-                disableWebPagePreview: true,
                 replyMarkup: InlineKeyboard is not null ? new InlineKeyboardMarkup(InlineKeyboard) : null,
                 cancellationToken: cancellationToken
             );
         } else {
-            await _bot.SendTextMessageAsync(
+            await _bot.SendMessage(
                 chatId,
                 Text,
                 parseMode: ParseMode.MarkdownV2,
-                disableWebPagePreview: true,
                 disableNotification: true,
                 replyMarkup: InlineKeyboard is not null ? new InlineKeyboardMarkup(InlineKeyboard) : null,
-                replyToMessageId: chatType is ChatType.Private ? null : replyToMessageId,
+                replyParameters: chatType is ChatType.Private || !replyToMessageId.HasValue
+                    ? null
+                    : new ReplyParameters { MessageId = replyToMessageId.Value },
                 cancellationToken: cancellationToken
             );
         }

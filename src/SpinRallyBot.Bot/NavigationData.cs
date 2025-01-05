@@ -23,10 +23,13 @@ public abstract class NavigationData {
             NewThread = newThread;
         }
 
-        [JsonPropertyName("C")] public Command Command { get; init; }
+        [JsonPropertyName("C")]
+        public Command Command { get; init; }
 
-        [JsonPropertyName("D")] public string? Data { get; init; }
-        [JsonPropertyName("T")] public bool NewThread { get; init; }
+        [JsonPropertyName("D")]
+        public string? Data { get; init; }
+        [JsonPropertyName("T")]
+        public bool NewThread { get; init; }
     }
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
@@ -39,9 +42,11 @@ public abstract class NavigationData {
             Data = data ?? Array.Empty<string>();
         }
 
-        [JsonPropertyName("P")] public Pipeline Pipeline { get; init; }
+        [JsonPropertyName("P")]
+        public Pipeline Pipeline { get; init; }
 
-        [JsonPropertyName("D")] public string[] Data { get; init; } = Array.Empty<string>();
+        [JsonPropertyName("D")]
+        public string[] Data { get; init; } = Array.Empty<string>();
     }
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
@@ -55,10 +60,13 @@ public abstract class NavigationData {
             NewThread = newTread;
         }
 
-        [JsonPropertyName("A")] public Actions Action { get; init; }
+        [JsonPropertyName("A")]
+        public Actions Action { get; init; }
 
-        [JsonPropertyName("D")] public string? Data { get; init; }
-        [JsonPropertyName("T")] public bool NewThread { get; init; }
+        [JsonPropertyName("D")]
+        public string? Data { get; init; }
+        [JsonPropertyName("T")]
+        public bool NewThread { get; init; }
     }
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
@@ -70,6 +78,7 @@ public abstract class NavigationData {
             Guid = guid;
         }
 
-        [JsonPropertyName("G")] public Guid Guid { get; init; }
+        [JsonPropertyName("G")]
+        public Guid Guid { get; init; }
     }
 }

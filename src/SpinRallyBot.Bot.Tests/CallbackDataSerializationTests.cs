@@ -7,7 +7,7 @@ public class CallbackDataSerializationTests {
     public void SerializeForCommandAndDeserializeForCommand() {
         var callbackData = new NavigationData.CommandData(Command.Find, "/players/?id=52a31ad");
 
-        var json = JsonSerializer.Serialize(callbackData);
+        string json = JsonSerializer.Serialize(callbackData);
         var data = JsonSerializer.Deserialize<NavigationData>(json);
 
         json.Length.Should().BeLessOrEqualTo(64);
@@ -21,7 +21,7 @@ public class CallbackDataSerializationTests {
     public void SerializeCallbackDataAndDeserializeForCommand() {
         NavigationData navigationData = new NavigationData.CommandData(Command.Find, "/players/?id=52a31ad");
 
-        var json = JsonSerializer.Serialize(navigationData);
+        string json = JsonSerializer.Serialize(navigationData);
         var data = JsonSerializer.Deserialize<NavigationData>(json);
 
         json.Length.Should().BeLessOrEqualTo(64);

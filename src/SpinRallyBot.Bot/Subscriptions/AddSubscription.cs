@@ -19,8 +19,8 @@ public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
             return;
         }
 
-        var cancellationToken = context.CancellationToken;
-        var response = await _mediator
+        CancellationToken cancellationToken = context.CancellationToken;
+        Response<GetPlayerResult, GetPlayerNotFoundResult> response = await _mediator
             .CreateRequestClient<GetPlayer>()
             .GetResponse<GetPlayerResult, GetPlayerNotFoundResult>(new GetPlayer(playerUrl),
                 cancellationToken);
@@ -31,15 +31,16 @@ public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
             };
         }
 
-        if (!response.Is<GetPlayerResult>(out var result) || result.Message is not { } player) {
+        if (!response.Is<GetPlayerResult>(out Response<GetPlayerResult>? result) || result.Message is not { } player) {
             throw new UnreachableException();
         }
 
-        var entity = await _db.Subscriptions.FindAsync(new object[] { chatId, playerUrl }, cancellationToken)
-                     ?? new SubscriptionEntity {
-                         ChatId = chatId,
-                         PlayerUrl = player.PlayerUrl
-                     };
+        SubscriptionEntity entity =
+            await _db.Subscriptions.FindAsync(new object[] { chatId, playerUrl }, cancellationToken)
+            ?? new SubscriptionEntity {
+                ChatId = chatId,
+                PlayerUrl = player.PlayerUrl
+            };
 
         if (_db.Entry(entity).State is EntityState.Detached) {
             _db.Add(entity);

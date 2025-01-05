@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <ProjectReference Include="..\SpinRallyBot.Bot\SpinRallyBot.Bot.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SpinRallyBot.Bot\SpinRallyBot.Bot.csproj" />
+  </ItemGroup>
 </Project>

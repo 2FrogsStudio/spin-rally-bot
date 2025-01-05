@@ -35,11 +35,11 @@ public class InitUpdaterJobConsumer(IHostEnvironment hostEnvironment, IBus bus, 
     }
 
     private async Task<string?> GetCurrentCronSchedule(string scheduleId,
-                                                       string scheduleGroup,
-                                                       CancellationToken cancellationToken) {
+        string scheduleGroup,
+        CancellationToken cancellationToken) {
         IScheduler scheduler = await schedulerFactory.GetScheduler(cancellationToken);
         var triggerKey = new TriggerKey("Recurring.Trigger." + scheduleId,
-                                        scheduleGroup);
+            scheduleGroup);
         ITrigger? trigger = await scheduler.GetTrigger(triggerKey, cancellationToken);
 
         return trigger is ICronTrigger {

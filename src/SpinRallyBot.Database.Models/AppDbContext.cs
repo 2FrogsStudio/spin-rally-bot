@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
 namespace SpinRallyBot;
 
 public abstract class AppDbContext(DbContextOptions options) : DbContext(options) {
@@ -19,8 +21,8 @@ public abstract class AppDbContext(DbContextOptions options) : DbContext(options
 
     private void FillDatedEntities() {
         var nowLazy = new Lazy<DateTimeOffset>(() => DateTimeOffset.UtcNow);
-        foreach (var entry in ChangeTracker.Entries<IDatedEntity>()) {
-            var entity = entry.Entity;
+        foreach (EntityEntry<IDatedEntity> entry in ChangeTracker.Entries<IDatedEntity>()) {
+            IDatedEntity entity = entry.Entity;
             switch (entry.State) {
                 case EntityState.Added:
                     entity.Created = nowLazy.Value;

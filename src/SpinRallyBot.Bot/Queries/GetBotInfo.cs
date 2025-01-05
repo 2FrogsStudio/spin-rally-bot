@@ -14,13 +14,13 @@ public class GetBotInfoConsumer : IMediatorConsumer<GetBotInfo> {
     }
 
     public async Task Consume(ConsumeContext<GetBotInfo> context) {
-        var cancellationToken = context.CancellationToken;
-        var botInfo = await _memoryCache.GetOrCreateAsync("BotInfo", async entry => {
+        CancellationToken cancellationToken = context.CancellationToken;
+        BotInfo? botInfo = await _memoryCache.GetOrCreateAsync("BotInfo", async entry => {
             entry.Size = 1;
             entry.SetPriority(CacheItemPriority.NeverRemove);
-            var botUser = await _botClient.GetMeAsync(cancellationToken);
-            return new BotInfo(botUser.Username!);
+            User botUser = await _botClient.GetMe(cancellationToken);
+            return new BotInfo(botUser.Username ?? throw new InvalidOperationException());
         });
-        await context.RespondAsync(botInfo!);
+        await context.RespondAsync(botInfo ?? throw new InvalidOperationException());
     }
 }

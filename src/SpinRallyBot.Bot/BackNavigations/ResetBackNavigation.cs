@@ -10,12 +10,13 @@ public class ResetBackNavigationConsumer : IMediatorConsumer<ResetBackNavigation
     }
 
     public async Task Consume(ConsumeContext<ResetBackNavigation> context) {
-        var userId = context.Message.UserId;
-        var chatId = context.Message.ChatId;
+        long userId = context.Message.UserId;
+        long chatId = context.Message.ChatId;
 
-        var cancellationToken = context.CancellationToken;
-        var entity = await _db.BackNavigations.FindAsync(new object[] { userId, chatId }, cancellationToken)
-                     ?? new BackNavigationEntity { UserId = userId, ChatId = chatId };
+        CancellationToken cancellationToken = context.CancellationToken;
+        BackNavigationEntity entity =
+            await _db.BackNavigations.FindAsync(new object[] { userId, chatId }, cancellationToken)
+            ?? new BackNavigationEntity { UserId = userId, ChatId = chatId };
 
         entity.Data = JsonSerializer.Serialize(new BackNavigation[] {
             new(Guid.NewGuid(), "↩︎ Меню", new NavigationData.CommandData(Command.Start))

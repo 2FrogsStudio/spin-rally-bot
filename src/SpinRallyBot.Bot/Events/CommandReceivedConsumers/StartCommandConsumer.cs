@@ -11,10 +11,10 @@ public class StartCommandConsumer : CommandReceivedConsumerBase {
     protected override async Task ConsumeAndGetReply(long userId, long chatId, int? replyToMessageId, string[] args,
         bool isBotAdmin,
         CancellationToken cancellationToken) {
-        var commandMenuRows = CommandHelpers.CommandAttributeByCommand
+        IEnumerable<InlineKeyboardButton[]> commandMenuRows = CommandHelpers.CommandAttributeByCommand
             .Where(pair => pair.Value?.InlineName != null)
             .Select(pair => {
-                var name = pair.Value!.InlineName!;
+                string name = pair.Value!.InlineName!;
                 var data = new NavigationData.PipelineData(pair.Value.Pipeline);
                 return new InlineKeyboardButton(name) {
                     CallbackData = JsonSerializer.Serialize(data)
@@ -22,12 +22,12 @@ public class StartCommandConsumer : CommandReceivedConsumerBase {
             })
             .Split(3);
 
-        var subscriptions = (await _mediator
+        GetSubscriptionsByChatIdResult subscriptions = (await _mediator
                 .CreateRequestClient<GetSubscriptionsByChatId>()
                 .GetResponse<GetSubscriptionsByChatIdResult>(new GetSubscriptionsByChatId(chatId), cancellationToken))
             .Message;
 
-        var playerButtonRows = subscriptions.Subscriptions
+        InlineKeyboardButton[][] playerButtonRows = subscriptions.Subscriptions
             .Select(s => new InlineKeyboardButton($"{s.Fio} ({s.Rating})") {
                 CallbackData = JsonSerializer.Serialize(new NavigationData.CommandData(Command.Find, s.PlayerUrl))
             }).Split(1).ToArray();

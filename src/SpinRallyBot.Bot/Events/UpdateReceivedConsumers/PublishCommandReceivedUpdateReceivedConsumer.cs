@@ -17,8 +17,8 @@ public class PublishCommandReceivedUpdateReceivedConsumer : IConsumer<UpdateRece
     }
 
     public async Task Consume(ConsumeContext<UpdateReceived> context) {
-        var update = context.Message.Update;
-        var cancellationToken = context.CancellationToken;
+        Update update = context.Message.Update;
+        CancellationToken cancellationToken = context.CancellationToken;
 
         if (update is not {
                 Message : {
@@ -36,14 +36,14 @@ public class PublishCommandReceivedUpdateReceivedConsumer : IConsumer<UpdateRece
             return;
         }
 
-        var isBotAdmin = context.Message.IsBotAdmin;
-        var commandAndArgs = messageText.Split(' ');
-        var commandAndUserName = commandAndArgs[0].Split('@', 2);
+        bool isBotAdmin = context.Message.IsBotAdmin;
+        string[] commandAndArgs = messageText.Split(' ');
+        string[] commandAndUserName = commandAndArgs[0].Split('@', 2);
         switch (commandAndUserName.Length) {
             case 1 when update.Message.Chat.Type is not ChatType.Private && _hostEnvironment.IsDevelopment():
                 return;
             case 2: {
-                var botInfo = (await _mediator
+                BotInfo botInfo = (await _mediator
                     .CreateRequestClient<GetBotInfo>()
                     .GetResponse<BotInfo>(new GetBotInfo(), cancellationToken)).Message;
                 if (commandAndUserName[1] != botInfo.Username) {
@@ -57,23 +57,23 @@ public class PublishCommandReceivedUpdateReceivedConsumer : IConsumer<UpdateRece
             }
         }
 
-        var command = CommandHelpers.CommandByText.GetValueOrDefault(commandAndUserName[0], Command.Unknown);
-        var args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : Array.Empty<string>();
+        Command command = CommandHelpers.CommandByText.GetValueOrDefault(commandAndUserName[0], Command.Unknown);
+        string[] args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : Array.Empty<string>();
 
-        using var commandScope = _logger.BeginScope(new Dictionary<string, object> {
+        using IDisposable? commandScope = _logger.BeginScope(new Dictionary<string, object> {
             { "Command", command.ToString() },
             { "Args", string.Join(",", args) }
         });
 
         if (args is ["help", ..] or [.., "help"]) {
-            var help = CommandHelpers.HelpByCommand[command];
+            string? help = CommandHelpers.HelpByCommand[command];
             if (help is not null) {
-                await _botClient.SendTextMessageAsync(
+                await _botClient.SendMessage(
                     chatId,
                     help,
                     parseMode: ParseMode.MarkdownV2,
                     disableNotification: true,
-                    replyToMessageId: messageId,
+                    replyParameters: new ReplyParameters { MessageId = messageId },
                     replyMarkup: new ReplyKeyboardRemove(),
                     cancellationToken: context.CancellationToken);
                 return;

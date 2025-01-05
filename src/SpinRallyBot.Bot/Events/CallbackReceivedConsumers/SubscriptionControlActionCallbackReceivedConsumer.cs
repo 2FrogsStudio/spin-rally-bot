@@ -3,7 +3,6 @@ namespace SpinRallyBot.Events.CallbackReceivedConsumers;
 public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsumer<CallbackReceived> {
     private readonly IScopedMediator _mediator;
 
-
     public SubscriptionControlActionCallbackReceivedConsumer(IScopedMediator mediator) {
         _mediator = mediator;
     }
@@ -23,7 +22,7 @@ public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsum
             return;
         }
 
-        var cancellationToken = context.CancellationToken;
+        CancellationToken cancellationToken = context.CancellationToken;
 
         switch (action) {
             case Actions.Subscribe:
@@ -44,7 +43,6 @@ public class SubscriptionControlActionCallbackReceivedConsumer : IMediatorConsum
             userId,
             context.Message.IsBotAdmin
         ), cancellationToken);
-
 
         // var popResponse = await _mediator
         //     .CreateRequestClient<PopBackNavigation>()

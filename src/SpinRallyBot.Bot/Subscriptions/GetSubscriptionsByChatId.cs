@@ -12,7 +12,7 @@ public class GetSubscriptionsByChatIdConsumer : IMediatorConsumer<GetSubscriptio
     }
 
     public async Task Consume(ConsumeContext<GetSubscriptionsByChatId> context) {
-        var cancellationToken = context.CancellationToken;
+        CancellationToken cancellationToken = context.CancellationToken;
 
         var subscriptionEntities = await _db.Subscriptions
             .Where(s => s.ChatId == context.Message.ChatId)

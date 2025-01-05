@@ -26,16 +26,16 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
         }
 
         // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
-        var args = data ?? Array.Empty<string>();
-        var cancellationToken = context.CancellationToken;
+        string[] args = data ?? Array.Empty<string>();
+        CancellationToken cancellationToken = context.CancellationToken;
 
         switch (args) {
             case []:
                 //input player pipeline
-                var arg = Command.Find.GetAttributesOfType<CommandArgAttribute>()[0];
+                CommandArgAttribute arg = Command.Find.GetAttributesOfType<CommandArgAttribute>()[0];
                 await _mediator.Send(new SetPipelineData(userId, chatId, new PipelineData(Pipeline.Find)),
                     cancellationToken);
-                await _botClient.SendTextMessageAsync(
+                await _botClient.SendMessage(
                     chatId,
                     arg.Name,
                     disableNotification: true,

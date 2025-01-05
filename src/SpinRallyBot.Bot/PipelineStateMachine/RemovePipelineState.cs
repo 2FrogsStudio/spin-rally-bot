@@ -10,7 +10,7 @@ public class RemovePipelineStateConsumer : IMediatorConsumer<RemovePipelineState
     }
 
     public async Task Consume(ConsumeContext<RemovePipelineState> context) {
-        var cancellationToken = context.CancellationToken;
+        CancellationToken cancellationToken = context.CancellationToken;
         var entity = await _db.FindAsync<PipelineStateEntity>(new object[] {
             context.Message.UserId,
             context.Message.ChatId
