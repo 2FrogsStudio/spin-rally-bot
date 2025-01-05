@@ -1,10 +1,10 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
 using Quartz;
 using Serilog.Enrichers.Sensitive;
 using SpinRallyBot.Events.PlayerRatingChangedConsumers;
 using SpinRallyBot.Serilog;
 using SpinRallyBot.Subscriptions;
+using Telegram.Bot;
 
 namespace SpinRallyBot;
 
@@ -45,12 +45,12 @@ public static class HostApplicationBuilderExtensions {
                 if (builder.Configuration["AMQP_URI"] is { } amqpUri) {
                     x.UsingRabbitMq((context, cfg) => {
                         cfg.Host(amqpUri);
-                        ConfigureNewtonsoft(cfg);
+                        cfg.ConfigureJsonSerializerOptions(AddJsonBotApiJsonSerializerOptions);
                         cfg.ConfigureEndpoints(context);
                     });
                 } else {
                     x.UsingInMemory((context, cfg) => {
-                        ConfigureNewtonsoft(cfg);
+                        cfg.ConfigureJsonSerializerOptions(AddJsonBotApiJsonSerializerOptions);
                         cfg.ConfigureEndpoints(context);
                     });
                 }
@@ -60,19 +60,6 @@ public static class HostApplicationBuilderExtensions {
                     typeof(NotifySubscribersPlayerRatingChangedConsumer).Assembly);
             });
         return builder;
-    }
-
-    private static void ConfigureNewtonsoft(IBusFactoryConfigurator cfg) {
-        cfg.UseNewtonsoftJsonSerializer();
-        cfg.ConfigureNewtonsoftJsonSerializer(_ => new JsonSerializerSettings {
-            NullValueHandling = NullValueHandling.Include,
-            ContractResolver = new CamelCasePropertyNamesContractResolver {
-                IgnoreSerializableAttribute = true,
-                IgnoreShouldSerializeMembers = true
-            },
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
-        });
     }
 
     public static HostApplicationBuilder AddQuartz(this HostApplicationBuilder builder) {
@@ -97,8 +84,15 @@ public static class HostApplicationBuilderExtensions {
                     default:
                         throw new Exception($"Unsupported provider: {provider}");
                 }
+
+                s.UseSystemTextJsonSerializer();
             });
         });
         return builder;
+    }
+
+    private static JsonSerializerOptions AddJsonBotApiJsonSerializerOptions(JsonSerializerOptions options) {
+        JsonBotAPI.Configure(options);
+        return options;
     }
 }
