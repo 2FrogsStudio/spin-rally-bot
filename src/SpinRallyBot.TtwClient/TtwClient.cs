@@ -1,5 +1,6 @@
 using System.Net;
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 
 namespace SpinRallyBot;
@@ -15,21 +16,22 @@ public class TtwClient : ITtwClient {
 
     public async Task<PlayerInfo?> GetPlayerInfo(string playerUrl, CancellationToken cancellationToken) {
         var request = new HttpRequestMessage(HttpMethod.Get, playerUrl);
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
         if (response.StatusCode is HttpStatusCode.NotFound) {
             return null;
         }
 
         response.EnsureSuccessStatusCode();
 
-        var doc = await _htmlParser.ParseDocumentAsync(await response.Content.ReadAsStreamAsync(cancellationToken));
+        IHtmlDocument doc =
+            await _htmlParser.ParseDocumentAsync(await response.Content.ReadAsStreamAsync(cancellationToken));
 
-        var fio = doc.QuerySelector("div.player-page h1 span")!.Text();
+        string fio = doc.QuerySelector("div.player-page h1 span")!.Text();
 
-        var playerPage = doc.QuerySelector("div.player-page");
+        IElement? playerPage = doc.QuerySelector("div.player-page");
 
-        var rating = float.Parse(playerPage!.QuerySelector("div.player-all-games th.rating-rating-cell")!.Text());
-        var position = uint.Parse(playerPage.QuerySelector("div.header-position")!.Text());
+        float rating = float.Parse(playerPage!.QuerySelector("div.player-all-games th.rating-rating-cell")!.Text());
+        uint position = uint.Parse(playerPage.QuerySelector("div.header-position")!.Text());
 
         return new PlayerInfo(
             playerUrl,
@@ -50,12 +52,13 @@ public class TtwClient : ITtwClient {
             })
         };
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        var doc = await _htmlParser.ParseDocumentAsync(await response.Content.ReadAsStreamAsync(cancellationToken));
+        IHtmlDocument doc =
+            await _htmlParser.ParseDocumentAsync(await response.Content.ReadAsStreamAsync(cancellationToken));
 
-        var htmlPlayers = doc.QuerySelectorAll("div a");
+        IHtmlCollection<IElement> htmlPlayers = doc.QuerySelectorAll("div a");
         return htmlPlayers.Select(h => new Player(
             h.Attributes.GetNamedItem("href")!.Text(),
             h.Text()

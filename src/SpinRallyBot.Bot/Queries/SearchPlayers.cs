@@ -12,9 +12,9 @@ public class SearchPlayersConsumer : IMediatorConsumer<SearchPlayers> {
     }
 
     public async Task Consume(ConsumeContext<SearchPlayers> context) {
-        var cancellationToken = context.CancellationToken;
+        CancellationToken cancellationToken = context.CancellationToken;
 
-        var players = await _ttwClient.FindPlayers(context.Message.SearchQuery, cancellationToken);
+        Player[] players = await _ttwClient.FindPlayers(context.Message.SearchQuery, cancellationToken);
 
         await context.RespondAsync(new SearchPlayersResult(
             players

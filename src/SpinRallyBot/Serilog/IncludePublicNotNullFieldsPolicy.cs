@@ -13,7 +13,7 @@ internal class IncludePublicNotNullFieldsPolicy : IDestructuringPolicy {
             return false;
         }
 
-        var fieldsWithValues = value.GetType()
+        IEnumerable<LogEventProperty> fieldsWithValues = value.GetType()
             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
             .Where(p => p.CanRead)
             .Select(f => new { name = f.Name, value = f.GetValue(value) })

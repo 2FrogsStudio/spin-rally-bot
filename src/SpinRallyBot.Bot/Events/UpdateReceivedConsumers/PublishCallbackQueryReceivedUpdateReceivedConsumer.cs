@@ -10,7 +10,7 @@ public class PublishCallbackQueryReceivedUpdateReceivedConsumer : IConsumer<Upda
     }
 
     public async Task Consume(ConsumeContext<UpdateReceived> context) {
-        var update = context.Message.Update;
+        Update update = context.Message.Update;
         if (update is not {
                 Type: UpdateType.CallbackQuery,
                 CallbackQuery: {
@@ -29,7 +29,7 @@ public class PublishCallbackQueryReceivedUpdateReceivedConsumer : IConsumer<Upda
             return;
         }
 
-        var cancellationToken = context.CancellationToken;
+        CancellationToken cancellationToken = context.CancellationToken;
 
         var navigationData = JsonSerializer.Deserialize<NavigationData>(data)!;
         try {
@@ -42,7 +42,7 @@ public class PublishCallbackQueryReceivedUpdateReceivedConsumer : IConsumer<Upda
                 context.Message.IsBotAdmin
             ), cancellationToken);
         } finally {
-            await _botClient.AnswerCallbackQueryAsync(callbackId, cancellationToken: cancellationToken);
+            await _botClient.AnswerCallbackQuery(callbackId, cancellationToken: cancellationToken);
         }
     }
 }

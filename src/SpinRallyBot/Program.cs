@@ -2,7 +2,7 @@ using SpinRallyBot;
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
-var host = Host.CreateApplicationBuilder(args)
+IHost host = Host.CreateApplicationBuilder(args)
     .AddLogging()
     .AddMemoryCache()
     .AddDatabase()

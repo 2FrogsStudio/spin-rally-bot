@@ -12,8 +12,8 @@ public class GetPipelineDataRequestConsumer : IMediatorConsumer<GetPipelineData>
     }
 
     public async Task Consume(ConsumeContext<GetPipelineData> context) {
-        var cancellationToken = context.CancellationToken;
-        var pipelineState = await _db.PipelineState.FindAsync(new object[] {
+        CancellationToken cancellationToken = context.CancellationToken;
+        PipelineStateEntity? pipelineState = await _db.PipelineState.FindAsync(new object[] {
             context.Message.UserId,
             context.Message.ChatId
         }, cancellationToken);

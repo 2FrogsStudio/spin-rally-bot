@@ -12,10 +12,10 @@ public class PopBackNavigationConsumer : IMediatorConsumer<PopBackNavigation> {
     }
 
     public async Task Consume(ConsumeContext<PopBackNavigation> context) {
-        var query = context.Message;
-        var cancellationToken = context.CancellationToken;
+        PopBackNavigation query = context.Message;
+        CancellationToken cancellationToken = context.CancellationToken;
 
-        var entity =
+        BackNavigationEntity? entity =
             await _db.BackNavigations.FindAsync(new object[] { query.UserId, query.ChatId }, cancellationToken);
 
         if (string.IsNullOrEmpty(entity?.Data)
@@ -25,7 +25,7 @@ public class PopBackNavigationConsumer : IMediatorConsumer<PopBackNavigation> {
             return;
         }
 
-        var findIndex = query.Guid is not null
+        int findIndex = query.Guid is not null
             ? list.FindIndex(navigation => navigation.Guid == query.Guid)
             : list.Count - 1;
 

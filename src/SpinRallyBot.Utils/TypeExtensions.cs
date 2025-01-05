@@ -2,7 +2,7 @@ namespace SpinRallyBot;
 
 public static class TypeExtensions {
     public static bool IsAssignableToGenericType(this Type givenType, Type genericType) {
-        var interfaceTypes = givenType.GetInterfaces();
+        Type[] interfaceTypes = givenType.GetInterfaces();
 
         if (interfaceTypes.Any(it => it.IsGenericType && it.GetGenericTypeDefinition() == genericType)) {
             return true;
@@ -12,7 +12,7 @@ public static class TypeExtensions {
             return true;
         }
 
-        var baseType = givenType.BaseType;
+        Type? baseType = givenType.BaseType;
         return baseType != null && IsAssignableToGenericType(baseType, genericType);
     }
 }

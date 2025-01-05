@@ -17,27 +17,27 @@ public static class CommandHelpers {
                 return null;
             }
 
-            var argAttrs = c.GetAttributesOfType<CommandArgAttribute>();
+            CommandArgAttribute[] argAttrs = c.GetAttributesOfType<CommandArgAttribute>();
             if (argAttrs.Length == 0) {
                 return description;
             }
 
-            var usages = argAttrs
+            IEnumerable<string> usages = argAttrs
                 .Where(arg => arg.DependsOn.Length == 0)
                 .Select(arg => $"{text} {GetSubArgs(argAttrs, arg.Name)}");
 
-            var args = argAttrs
+            IEnumerable<string> args = argAttrs
                 .Select(a => $"   {a.Name} - {a.Description}");
-            var help = description + '\n' +
-                       "Usages:\n" +
-                       string.Join('\n', usages) + "\n\n" +
-                       string.Join('\n', args);
+            string help = description + '\n' +
+                          "Usages:\n" +
+                          string.Join('\n', usages) + "\n\n" +
+                          string.Join('\n', args);
             return help.ToEscapedMarkdownV2();
         });
 
     // ReSharper disable once ParameterTypeCanBeEnumerable.Local
     private static string GetSubArgs(CommandArgAttribute[] args, string str) {
-        var arg = args.SingleOrDefault(a => a.DependsOn.Contains(str))?.Name;
+        string? arg = args.SingleOrDefault(a => a.DependsOn.Contains(str))?.Name;
         return arg is null ? str : GetSubArgs(args, $"{str} {arg}");
     }
 

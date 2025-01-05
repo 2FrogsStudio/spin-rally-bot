@@ -1,48 +1,48 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
 
-    <PropertyGroup>
-        <UserSecretsId>615b01f8-6bab-410d-9b9c-639714455797</UserSecretsId>
-    </PropertyGroup>
+  <PropertyGroup>
+    <UserSecretsId>615b01f8-6bab-410d-9b9c-639714455797</UserSecretsId>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <ContainerRepository>2frogsstudio/spin-rally-bot</ContainerRepository>
-        <ContainerImageTags Condition="$(ContainerImageTags) == ''">latest</ContainerImageTags>
-        <ContainerFamily>jammy-chiseled</ContainerFamily>
-    </PropertyGroup>
+  <PropertyGroup>
+    <ContainerRepository>2frogsstudio/spin-rally-bot</ContainerRepository>
+    <ContainerImageTags Condition="$(ContainerImageTags) == ''">latest</ContainerImageTags>
+    <ContainerFamily>jammy-chiseled</ContainerFamily>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <ContainerLabel Include="org.opencontainers.image.source" Value="https://github.com/$(ContainerRepository)" />
-    </ItemGroup>
+  <ItemGroup>
+    <ContainerLabel Include="org.opencontainers.image.source" Value="https://github.com/$(ContainerRepository)" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="MassTransit" />
-        <PackageReference Include="MassTransit.Quartz" />
-        <PackageReference Include="MassTransit.RabbitMQ" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-        <PackageReference Include="Sentry.Extensions.Logging" />
-        <PackageReference Include="Serilog.Enrichers.Environment" />
-        <PackageReference Include="Serilog.Enrichers.Sensitive" />
-        <PackageReference Include="Serilog.Extensions.Hosting" />
-        <PackageReference Include="Serilog.Formatting.Compact" />
-        <PackageReference Include="Serilog.Settings.Configuration" />
-        <PackageReference Include="Serilog.Sinks.Console" />
-        <PackageReference Include="Serilog.Sinks.File" />
-        <PackageReference Include="Serilog.Sinks.Elasticsearch" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.Quartz" />
+    <PackageReference Include="MassTransit.RabbitMQ" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Sentry.Extensions.Logging" />
+    <PackageReference Include="Serilog.Enrichers.Environment" />
+    <PackageReference Include="Serilog.Enrichers.Sensitive" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Formatting.Compact" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Content Update="appsettings.Development.json">
-            <DependentUpon>appsettings.json</DependentUpon>
-        </Content>
-    </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.Development.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\SpinRallyBot.Bot\SpinRallyBot.Bot.csproj" />
-        <ProjectReference Include="..\SpinRallyBot.Database\SpinRallyBot.Database.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SpinRallyBot.Bot\SpinRallyBot.Bot.csproj" />
+    <ProjectReference Include="..\SpinRallyBot.Database\SpinRallyBot.Database.csproj" />
+  </ItemGroup>
 
 </Project>

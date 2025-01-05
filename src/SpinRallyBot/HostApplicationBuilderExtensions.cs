@@ -82,23 +82,21 @@ public static class HostApplicationBuilderExtensions {
                 TimeSpan.FromHours(1).TotalMicroseconds.ToString(CultureInfo.InvariantCulture));
 
             q.UsePersistentStore(s => {
-                var provider = builder.Configuration.GetValue("Provider", "Postgres");
+                string provider = builder.Configuration.GetValue("Provider", "Postgres");
+                string connectionString = builder.Configuration.GetConnectionString(provider) ??
+                                          throw new InvalidOperationException();
                 switch (provider) {
                     case "Sqlite":
-                        s.UseMicrosoftSQLite(server =>
-                            server.ConnectionString = builder.Configuration.GetConnectionString(provider)!);
+                        s.UseMicrosoftSQLite(server => server.ConnectionString = connectionString);
                         break;
                     case "Postgres":
-                        s.UsePostgres(server =>
-                            server.ConnectionString = builder.Configuration.GetConnectionString(provider)!);
+                        s.UsePostgres(server => server.ConnectionString = connectionString);
                         // disabled die to avoid using active connection of free tier of neon.tech
                         // s.UseClustering();
                         break;
                     default:
                         throw new Exception($"Unsupported provider: {provider}");
                 }
-
-                s.UseNewtonsoftJsonSerializer();
             });
         });
         return builder;

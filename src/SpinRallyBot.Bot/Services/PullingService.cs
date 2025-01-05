@@ -14,8 +14,8 @@ internal class PullingService : BackgroundService {
         _client = client;
         _bus = bus;
         _receiverOptions = new ReceiverOptions {
-            AllowedUpdates = Array.Empty<UpdateType>(),
-            ThrowPendingUpdates = hostEnvironment.IsDevelopment()
+            AllowedUpdates = [],
+            DropPendingUpdates = hostEnvironment.IsDevelopment()
         };
     }
 

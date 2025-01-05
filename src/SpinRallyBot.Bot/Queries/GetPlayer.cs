@@ -21,17 +21,17 @@ public class GetPlayerConsumer : IMediatorConsumer<GetPlayer> {
     }
 
     public async Task Consume(ConsumeContext<GetPlayer> context) {
-        var cancellationToken = context.CancellationToken;
-        var playerUrl = context.Message.PlayerUrl;
+        CancellationToken cancellationToken = context.CancellationToken;
+        string playerUrl = context.Message.PlayerUrl;
 
-        var entity = await _db.Players.FindAsync(playerUrl, cancellationToken);
+        PlayerEntity? entity = await _db.Players.FindAsync([playerUrl], cancellationToken: cancellationToken);
 
         if (entity is null) {
             await context.RespondAsync(new GetPlayerNotFoundResult());
             return;
         }
 
-        var subscribers =
+        int subscribers =
             await _db.Subscriptions.CountAsync(s => s.PlayerUrl == playerUrl, cancellationToken);
 
         await context.RespondAsync(new GetPlayerResult(

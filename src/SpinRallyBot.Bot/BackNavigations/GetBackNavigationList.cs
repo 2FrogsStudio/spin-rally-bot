@@ -12,10 +12,10 @@ public class GetBackNavigationListConsumer : IMediatorConsumer<GetBackNavigation
     }
 
     public async Task Consume(ConsumeContext<GetBackNavigationList> context) {
-        var query = context.Message;
-        var cancellationToken = context.CancellationToken;
+        GetBackNavigationList query = context.Message;
+        CancellationToken cancellationToken = context.CancellationToken;
 
-        var entity =
+        BackNavigationEntity? entity =
             await _db.BackNavigations.FindAsync(new object[] { query.UserId, query.ChatId }, cancellationToken);
 
         if (string.IsNullOrEmpty(entity?.Data)
@@ -24,7 +24,8 @@ public class GetBackNavigationListConsumer : IMediatorConsumer<GetBackNavigation
             return;
         }
 
-        var result = list.Select(n => new GetBackNavigationResult(n.Name, n.Guid)).Reverse().ToArray();
+        GetBackNavigationResult[] result = list.Select(n => new GetBackNavigationResult(n.Name, n.Guid)).Reverse()
+            .ToArray();
         await context.RespondAsync(result);
     }
 }

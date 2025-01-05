@@ -15,12 +15,14 @@ public class StartUpdateJobConsumer : CommandReceivedConsumerBase {
     protected override async Task ConsumeAndGetReply(long userId, long chatId, int? replyToMessageId, string[] args,
         bool isBotAdmin,
         CancellationToken cancellationToken) {
-        var formatter = DefaultEndpointNameFormatter.Instance.Consumer<UpdatePlayersJobConsumer>();
+        string formatter = DefaultEndpointNameFormatter.Instance.Consumer<UpdatePlayersJobConsumer>();
         var endpoint = new Uri($"queue:{formatter}");
-        var sendEndpoint = await _bus.GetSendEndpoint(endpoint);
-        var message = await _botClient.SendTextMessageAsync(chatId, "⏳Обновление запущено..".ToEscapedMarkdownV2(),
+        ISendEndpoint sendEndpoint = await _bus.GetSendEndpoint(endpoint);
+        Message message = await _botClient.SendMessage(chatId, "⏳Обновление запущено..".ToEscapedMarkdownV2(),
             parseMode: ParseMode.MarkdownV2,
-            replyToMessageId: replyToMessageId,
+            replyParameters: replyToMessageId.HasValue
+                ? new ReplyParameters { MessageId = replyToMessageId.Value }
+                : null,
             cancellationToken: cancellationToken);
         await sendEndpoint.Send<UpdatePlayersJob>(new {
             __Header_ResponseChatId = chatId,

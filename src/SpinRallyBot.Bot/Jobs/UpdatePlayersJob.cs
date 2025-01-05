@@ -25,19 +25,19 @@ public class UpdatePlayersJobConsumer : IConsumer<UpdatePlayersJob> {
     }
 
     public async Task Consume(ConsumeContext<UpdatePlayersJob> context) {
-        var cancellationToken = context.CancellationToken;
-        var playerUrls = await _db.Players
-            // update all players to get actual info in find dialog too 
+        CancellationToken cancellationToken = context.CancellationToken;
+        string[] playerUrls = await _db.Players
+            // update all players to get actual info in find dialog too
             // .Where(p => p.Subscriptions.Count > 0)
             .Select(p => p.PlayerUrl)
             .ToArrayAsync(cancellationToken);
 
         var exceptions = new List<Exception>();
-        var chatId = context.Headers.Get<uint>("ResponseChatId");
-        var messageId = context.Headers.Get<int>("UpdateMessageId");
+        uint? chatId = context.Headers.Get<uint>("ResponseChatId");
+        int? messageId = context.Headers.Get<int>("UpdateMessageId");
 
-        for (var index = 0; index < playerUrls.Length; index++) {
-            var playerUrl = playerUrls[index];
+        for (int index = 0; index < playerUrls.Length; index++) {
+            string playerUrl = playerUrls[index];
             try {
                 await _mediator.Send(new UpdatePlayer(playerUrl, true), cancellationToken);
                 await UpdateProgressMessage(chatId, messageId, index + 1, playerUrls.Length, cancellationToken);
@@ -63,8 +63,8 @@ public class UpdatePlayersJobConsumer : IConsumer<UpdatePlayersJob> {
             return;
         }
 
-        var totalProgress = Math.Round((float)progress / count * 100, 0);
-        await _bot.EditMessageTextAsync(chatId.Value, messageId.Value,
+        double totalProgress = Math.Round((float)progress / count * 100, 0);
+        await _bot.EditMessageText(chatId.Value, messageId.Value,
             $"⏳Обновление {totalProgress}%..".ToEscapedMarkdownV2(), ParseMode.MarkdownV2,
             cancellationToken: cancellationToken);
     }
@@ -75,10 +75,10 @@ public class UpdatePlayersJobConsumer : IConsumer<UpdatePlayersJob> {
             return;
         }
 
-        var text = failed
+        string text = failed
             ? "🚨 Ошибка при обновлении рейтинга, проверьте логи"
             : "✅ Обновление завершено";
-        await _bot.EditMessageTextAsync(chatId.Value, messageId.Value, text,
+        await _bot.EditMessageText(chatId.Value, messageId.Value, text,
             cancellationToken: cancellationToken);
     }
 }

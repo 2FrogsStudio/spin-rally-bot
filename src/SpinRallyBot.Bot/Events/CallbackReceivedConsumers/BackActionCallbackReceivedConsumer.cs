@@ -3,7 +3,6 @@ namespace SpinRallyBot.Events.CallbackReceivedConsumers;
 public class BackActionCallbackReceivedConsumer : IMediatorConsumer<CallbackReceived> {
     private readonly IScopedMediator _mediator;
 
-
     public BackActionCallbackReceivedConsumer(IScopedMediator mediator) {
         _mediator = mediator;
     }
@@ -21,14 +20,15 @@ public class BackActionCallbackReceivedConsumer : IMediatorConsumer<CallbackRece
             return;
         }
 
-        var cancellationToken = context.CancellationToken;
+        CancellationToken cancellationToken = context.CancellationToken;
 
-        var response = await _mediator
+        Response<BackNavigation, EmptyNavigation> response = await _mediator
             .CreateRequestClient<PopBackNavigation>()
             .GetResponse<BackNavigation, EmptyNavigation>(new PopBackNavigation(userId, chatId, guid),
                 cancellationToken);
 
-        if (response.Is<BackNavigation>(out var backResponse) && backResponse.Message.Data is { } data) {
+        if (response.Is<BackNavigation>(out Response<BackNavigation>? backResponse) &&
+            backResponse.Message.Data is { } data) {
             await _mediator.Publish(new CallbackReceived(
                 data,
                 messageId,

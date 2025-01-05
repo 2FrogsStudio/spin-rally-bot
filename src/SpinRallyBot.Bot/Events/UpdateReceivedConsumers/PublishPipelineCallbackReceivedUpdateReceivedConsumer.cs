@@ -8,8 +8,8 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IConsumer<U
     }
 
     public async Task Consume(ConsumeContext<UpdateReceived> context) {
-        var update = context.Message.Update;
-        var cancellationToken = context.CancellationToken;
+        Update update = context.Message.Update;
+        CancellationToken cancellationToken = context.CancellationToken;
 
         if (update is not {
                 Message : {
@@ -25,7 +25,7 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IConsumer<U
             return;
         }
 
-        var result = await _mediator
+        Response<PipelineData, NoPipelineStateResult> result = await _mediator
             .CreateRequestClient<GetPipelineData>()
             .GetResponse<PipelineData, NoPipelineStateResult>(new GetPipelineData(userId, chatId), cancellationToken);
 
@@ -33,7 +33,7 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer : IConsumer<U
             return;
         }
 
-        if (!result.Is<PipelineData>(out var response)
+        if (!result.Is<PipelineData>(out Response<PipelineData>? response)
             || response is not { Message: { Pipeline: var pipeline, Args: var args } }) {
             throw new UnreachableException();
         }

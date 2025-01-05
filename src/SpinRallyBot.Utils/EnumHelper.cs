@@ -11,16 +11,16 @@ public static class EnumHelper {
     /// <returns>The attribute of type T that exists on the enum value</returns>
     /// <example><![CDATA[string desc = myEnumVariable.GetAttributeOfType<DescriptionAttribute>().Description;]]></example>
     public static T? GetAttributeOfType<T>(this Enum enumVal) where T : Attribute {
-        var type = enumVal.GetType();
-        var memInfo = type.GetMember(enumVal.ToString());
-        var attribute = memInfo[0].GetCustomAttribute(typeof(T), false);
+        Type type = enumVal.GetType();
+        MemberInfo[] memInfo = type.GetMember(enumVal.ToString());
+        Attribute? attribute = memInfo[0].GetCustomAttribute(typeof(T), false);
         return (T?)attribute;
     }
 
     public static T[] GetAttributesOfType<T>(this Enum enumVal) where T : Attribute {
-        var type = enumVal.GetType();
-        var memInfo = type.GetMember(enumVal.ToString());
-        var attribute = memInfo[0].GetCustomAttributes(typeof(T), false);
+        Type type = enumVal.GetType();
+        MemberInfo[] memInfo = type.GetMember(enumVal.ToString());
+        object[] attribute = memInfo[0].GetCustomAttributes(typeof(T), false);
         return (T[])attribute;
     }
 }

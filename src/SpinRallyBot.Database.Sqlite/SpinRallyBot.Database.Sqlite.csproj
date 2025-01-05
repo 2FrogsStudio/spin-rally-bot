@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\SpinRallyBot.Database.Models\SpinRallyBot.Database.Models.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SpinRallyBot.Database.Models\SpinRallyBot.Database.Models.csproj" />
+  </ItemGroup>
 
 </Project>

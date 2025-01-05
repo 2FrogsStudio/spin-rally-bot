@@ -2,7 +2,7 @@ namespace SpinRallyBot;
 
 public static class HostApplicationBuilderExtensions {
     public static HostApplicationBuilder AddDatabase(this HostApplicationBuilder builder) {
-        var provider = builder.Configuration.GetValue("Provider", "Postgres");
+        string provider = builder.Configuration.GetValue("Provider", "Postgres");
 
         switch (provider) {
             case "Sqlite":
