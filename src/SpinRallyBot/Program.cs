@@ -1,5 +1,3 @@
-using SpinRallyBot;
-
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
 IHost host = Host.CreateApplicationBuilder(args)
