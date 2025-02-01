@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SpinRallyBot;
 
@@ -10,9 +11,11 @@ using SpinRallyBot;
 namespace SpinRallyBot.Migrations
 {
     [DbContext(typeof(SqliteDbContext))]
-    partial class SqliteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250201190433_UpgradeTo901")]
+    partial class UpgradeTo901
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
