@@ -14,7 +14,8 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
         while (true) {
             switch (args) {
                 case [{ } url, ..] when TryGetPlayerUrlAndId(url, out string? playerUrl, out string? playerId):
-                    await ComposePlayerInfo(chatId, playerUrl, playerId, cancellationToken);
+                    await ComposePlayerInfo(chatId, playerUrl ?? throw new InvalidOperationException(),
+                        playerId ?? throw new InvalidOperationException(), cancellationToken);
                     return;
                 case [{ } search, ..]:
                     (string Fio, string PlayerUrl)[] players = await SearchPlayers(search, cancellationToken);
@@ -23,7 +24,7 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
                             Text = "Участники не найдены".ToEscapedMarkdownV2();
                             return;
                         case [var player]:
-                            args = new[] { player.PlayerUrl };
+                            args = [player.PlayerUrl];
                             continue;
                         default:
                             //todo: pagination
@@ -105,7 +106,7 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
         return response.Message.Players;
     }
 
-    private static bool TryGetPlayerUrlAndId(string url, out string playerUrl, out string playerId) {
+    private static bool TryGetPlayerUrlAndId(string url, out string? playerUrl, out string? playerId) {
         var baseUri = new Uri(Constants.RttwUrl);
         if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri)
             || string.IsNullOrWhiteSpace(uri.Host)) {
@@ -121,8 +122,8 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
             }
         }
 
-        playerId = null!;
-        playerUrl = null!;
+        playerId = null;
+        playerUrl = null;
         return false;
     }
 }
