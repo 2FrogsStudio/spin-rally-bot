@@ -7,7 +7,7 @@
   <PropertyGroup>
     <ContainerRepository>2frogsstudio/spin-rally-bot</ContainerRepository>
     <ContainerImageTags Condition="$(ContainerImageTags) == ''">latest</ContainerImageTags>
-    <ContainerFamily>jammy-chiseled</ContainerFamily>
+    <ContainerFamily>noble-chiseled</ContainerFamily>
   </PropertyGroup>
 
   <ItemGroup>
