@@ -18,7 +18,7 @@ public class UpdatePlayerConsumer : IMediatorConsumer<UpdatePlayer> {
         string playerUrl = context.Message.PlayerUrl;
         bool forceUpdate = context.Message.ForceUpdate;
 
-        PlayerEntity? entity = await _db.Players.FindAsync(new object[] { playerUrl }, cancellationToken);
+        PlayerEntity? entity = await _db.Players.FindAsync([playerUrl], cancellationToken);
         if (entity is null || forceUpdate) {
             PlayerInfo? playerInfo = await _ttwClient.GetPlayerInfo(playerUrl, cancellationToken);
             if (playerInfo is null) {

@@ -1,11 +1,7 @@
 namespace SpinRallyBot.Events.CallbackReceivedConsumers;
 
-public class CommandCallbackReceivedConsumer : IMediatorConsumer<CallbackReceived> {
-    private readonly IScopedMediator _mediator;
-
-    public CommandCallbackReceivedConsumer(IScopedMediator mediator) {
-        _mediator = mediator;
-    }
+public class CommandCallbackReceivedConsumer(IScopedMediator mediator) : IMediatorConsumer<CallbackReceived> {
+    private readonly IScopedMediator _mediator = mediator;
 
     public async Task Consume(ConsumeContext<CallbackReceived> context) {
         if (context.Message is not {
@@ -24,7 +20,7 @@ public class CommandCallbackReceivedConsumer : IMediatorConsumer<CallbackReceive
         }
 
         // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
-        string[] args = data?.Split(' ') ?? Array.Empty<string>();
+        string[] args = data?.Split(' ') ?? [];
 
         await _mediator.Publish(
             new CommandReceived(

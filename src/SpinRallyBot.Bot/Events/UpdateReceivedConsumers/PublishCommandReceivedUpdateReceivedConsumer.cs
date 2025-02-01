@@ -58,7 +58,7 @@ public class PublishCommandReceivedUpdateReceivedConsumer : IConsumer<UpdateRece
         }
 
         Command command = CommandHelpers.CommandByText.GetValueOrDefault(commandAndUserName[0], Command.Unknown);
-        string[] args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : Array.Empty<string>();
+        string[] args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : [];
 
         using IDisposable? commandScope = _logger.BeginScope(new Dictionary<string, object> {
             { "Command", command.ToString() },

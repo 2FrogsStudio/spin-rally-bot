@@ -7,5 +7,5 @@ public class PipelineStateEntity {
     public long UserId { get; set; }
     public long ChatId { get; set; }
     [MaxLength(10000)]
-    public string Data { get; set; } = null!;
+    public string Data { get; set; } = string.Empty;
 }

@@ -2,14 +2,10 @@ using SpinRallyBot.Attributes;
 
 namespace SpinRallyBot.Events.CallbackReceivedConsumers;
 
-public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackReceived> {
-    private readonly ITelegramBotClient _botClient;
-    private readonly IScopedMediator _mediator;
-
-    public FindPipelineCallbackReceivedConsumer(IScopedMediator mediator, ITelegramBotClient botClient) {
-        _mediator = mediator;
-        _botClient = botClient;
-    }
+public class FindPipelineCallbackReceivedConsumer(IScopedMediator mediator, ITelegramBotClient botClient)
+    : IMediatorConsumer<CallbackReceived> {
+    private readonly ITelegramBotClient _botClient = botClient;
+    private readonly IScopedMediator _mediator = mediator;
 
     public async Task Consume(ConsumeContext<CallbackReceived> context) {
         if (context.Message is not {
@@ -26,7 +22,7 @@ public class FindPipelineCallbackReceivedConsumer : IMediatorConsumer<CallbackRe
         }
 
         // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
-        string[] args = data ?? Array.Empty<string>();
+        string[] args = data ?? [];
         CancellationToken cancellationToken = context.CancellationToken;
 
         switch (args) {

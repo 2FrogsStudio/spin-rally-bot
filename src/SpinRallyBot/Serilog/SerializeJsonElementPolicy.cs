@@ -10,7 +10,7 @@ internal class SerializeJsonElementPolicy : IDestructuringPolicy {
         ILogEventPropertyValueFactory propertyValueFactory,
         out LogEventPropertyValue result) {
         if (value is not JsonElement jsonElement) {
-            result = null!;
+            result = new ScalarValue(null);
             return false;
         }
 

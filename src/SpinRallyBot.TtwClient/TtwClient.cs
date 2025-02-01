@@ -5,14 +5,9 @@ using AngleSharp.Html.Parser;
 
 namespace SpinRallyBot;
 
-public class TtwClient : ITtwClient {
-    private readonly IHtmlParser _htmlParser;
-    private readonly HttpClient _httpClient;
-
-    public TtwClient(HttpClient httpClient, IHtmlParser htmlParser) {
-        _httpClient = httpClient;
-        _htmlParser = htmlParser;
-    }
+public class TtwClient(HttpClient httpClient, IHtmlParser htmlParser) : ITtwClient {
+    private readonly IHtmlParser _htmlParser = htmlParser;
+    private readonly HttpClient _httpClient = httpClient;
 
     public async Task<PlayerInfo?> GetPlayerInfo(string playerUrl, CancellationToken cancellationToken) {
         var request = new HttpRequestMessage(HttpMethod.Get, playerUrl);
@@ -26,12 +21,14 @@ public class TtwClient : ITtwClient {
         IHtmlDocument doc =
             await _htmlParser.ParseDocumentAsync(await response.Content.ReadAsStreamAsync(cancellationToken));
 
-        string fio = doc.QuerySelector("div.player-page h1 span")!.Text();
+        string fio = doc.QuerySelector("div.player-page h1 span")?.Text() ?? throw new InvalidOperationException();
 
         IElement? playerPage = doc.QuerySelector("div.player-page");
 
-        float rating = float.Parse(playerPage!.QuerySelector("div.player-all-games th.rating-rating-cell")!.Text());
-        uint position = uint.Parse(playerPage.QuerySelector("div.header-position")!.Text());
+        float rating = float.Parse(playerPage?.QuerySelector("div.player-all-games th.rating-rating-cell")?.Text() ??
+                                   throw new InvalidOperationException());
+        uint position = uint.Parse(playerPage.QuerySelector("div.header-position")?.Text() ??
+                                   throw new InvalidOperationException());
 
         return new PlayerInfo(
             playerUrl,
@@ -42,14 +39,14 @@ public class TtwClient : ITtwClient {
 
     public async Task<Player[]> FindPlayers(string searchQuery, CancellationToken cancellationToken) {
         if (string.IsNullOrWhiteSpace(searchQuery)) {
-            return Array.Empty<Player>();
+            return [];
         }
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/wp-admin/admin-ajax.php") {
-            Content = new FormUrlEncodedContent(new KeyValuePair<string, string>[] {
-                new("action", "get_players_by_name"),
-                new("name", searchQuery)
-            })
+            Content = new FormUrlEncodedContent([
+                new KeyValuePair<string, string>("action", "get_players_by_name"),
+                new KeyValuePair<string, string>("name", searchQuery)
+            ])
         };
 
         HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
@@ -60,7 +57,7 @@ public class TtwClient : ITtwClient {
 
         IHtmlCollection<IElement> htmlPlayers = doc.QuerySelectorAll("div a");
         return htmlPlayers.Select(h => new Player(
-            h.Attributes.GetNamedItem("href")!.Text(),
+            h.Attributes.GetNamedItem("href")?.Text() ?? throw new InvalidOperationException(),
             h.Text()
         )).ToArray();
     }

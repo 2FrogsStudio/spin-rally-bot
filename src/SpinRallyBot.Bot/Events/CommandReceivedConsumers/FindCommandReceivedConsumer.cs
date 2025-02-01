@@ -1,12 +1,9 @@
 namespace SpinRallyBot.Events.CommandReceivedConsumers;
 
-public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
-    private readonly IScopedMediator _mediator;
-
-    public FindCommandReceivedConsumer(ITelegramBotClient botClient, IScopedMediator mediator) : base(Command.Find,
+public class FindCommandReceivedConsumer(ITelegramBotClient botClient, IScopedMediator mediator)
+    : CommandReceivedConsumerBase(Command.Find,
         botClient, mediator) {
-        _mediator = mediator;
-    }
+    private readonly IScopedMediator _mediator = mediator;
 
     protected override async Task ConsumeAndGetReply(long userId, long chatId, int? replyToMessageId, string[] args,
         bool isBotAdmin,
@@ -115,7 +112,7 @@ public class FindCommandReceivedConsumer : CommandReceivedConsumerBase {
 
         if (uri.Host == baseUri.Host
             && uri is { AbsolutePath: "/players/" }) {
-            playerId = HttpUtility.ParseQueryString(uri.Query).Get("id")!;
+            playerId = HttpUtility.ParseQueryString(uri.Query).Get("id");
             if (!string.IsNullOrWhiteSpace(playerId)) {
                 playerUrl = uri.PathAndQuery;
                 return true;

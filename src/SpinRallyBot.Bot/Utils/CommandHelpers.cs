@@ -9,7 +9,7 @@ public static class CommandHelpers {
     public static readonly IReadOnlyDictionary<string, Command> CommandByText =
         CommandAttributeByCommand
             .Where(d => d.Value?.Text is not null)
-            .ToDictionary(d => d.Value!.Text!, d => d.Key);
+            .ToDictionary(d => d.Value?.Text ?? throw new NullReferenceException(), d => d.Key);
 
     public static readonly IReadOnlyDictionary<Command, string?> HelpByCommand =
         Enum.GetValues<Command>().ToDictionary(c => c, c => {

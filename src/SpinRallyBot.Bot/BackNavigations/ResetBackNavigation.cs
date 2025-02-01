@@ -15,7 +15,7 @@ public class ResetBackNavigationConsumer : IMediatorConsumer<ResetBackNavigation
 
         CancellationToken cancellationToken = context.CancellationToken;
         BackNavigationEntity entity =
-            await _db.BackNavigations.FindAsync(new object[] { userId, chatId }, cancellationToken)
+            await _db.BackNavigations.FindAsync([userId, chatId], cancellationToken)
             ?? new BackNavigationEntity { UserId = userId, ChatId = chatId };
 
         entity.Data = JsonSerializer.Serialize(new BackNavigation[] {

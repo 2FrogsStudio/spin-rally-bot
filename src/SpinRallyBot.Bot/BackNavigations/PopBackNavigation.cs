@@ -16,7 +16,7 @@ public class PopBackNavigationConsumer : IMediatorConsumer<PopBackNavigation> {
         CancellationToken cancellationToken = context.CancellationToken;
 
         BackNavigationEntity? entity =
-            await _db.BackNavigations.FindAsync(new object[] { query.UserId, query.ChatId }, cancellationToken);
+            await _db.BackNavigations.FindAsync([query.UserId, query.ChatId], cancellationToken);
 
         if (string.IsNullOrEmpty(entity?.Data)
             || JsonSerializer.Deserialize<List<BackNavigation>>(entity.Data) is not { } list

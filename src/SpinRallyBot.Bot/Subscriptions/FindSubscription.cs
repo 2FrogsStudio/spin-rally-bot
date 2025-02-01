@@ -6,18 +6,14 @@ public record SubscriptionNotFound;
 
 public record SubscriptionFound;
 
-public class FindSubscriptionConsumer : IMediatorConsumer<FindSubscription> {
-    private readonly AppDbContext _db;
-
-    public FindSubscriptionConsumer(AppDbContext db) {
-        _db = db;
-    }
+public class FindSubscriptionConsumer(AppDbContext db) : IMediatorConsumer<FindSubscription> {
+    private readonly AppDbContext _db = db;
 
     public async Task Consume(ConsumeContext<FindSubscription> context) {
         CancellationToken cancellationToken = context.CancellationToken;
 
         SubscriptionEntity? subscription =
-            await _db.Subscriptions.FindAsync(new object[] { context.Message.ChatId, context.Message.PlayerUrl },
+            await _db.Subscriptions.FindAsync([context.Message.ChatId, context.Message.PlayerUrl],
                 cancellationToken);
 
         if (subscription is not null) {

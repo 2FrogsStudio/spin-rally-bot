@@ -2,14 +2,9 @@ namespace SpinRallyBot.Subscriptions;
 
 public record AddSubscription(long ChatId, string PlayerUrl);
 
-public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
-    private readonly AppDbContext _db;
-    private readonly IScopedMediator _mediator;
-
-    public AddSubscriptionConsumer(AppDbContext db, IScopedMediator mediator) {
-        _db = db;
-        _mediator = mediator;
-    }
+public class AddSubscriptionConsumer(AppDbContext db, IScopedMediator mediator) : IMediatorConsumer<AddSubscription> {
+    private readonly AppDbContext _db = db;
+    private readonly IScopedMediator _mediator = mediator;
 
     public async Task Consume(ConsumeContext<AddSubscription> context) {
         if (context.Message is not {
@@ -36,7 +31,7 @@ public class AddSubscriptionConsumer : IMediatorConsumer<AddSubscription> {
         }
 
         SubscriptionEntity entity =
-            await _db.Subscriptions.FindAsync(new object[] { chatId, playerUrl }, cancellationToken)
+            await _db.Subscriptions.FindAsync([chatId, playerUrl], cancellationToken)
             ?? new SubscriptionEntity {
                 ChatId = chatId,
                 PlayerUrl = player.PlayerUrl

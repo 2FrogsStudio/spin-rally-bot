@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 namespace SpinRallyBot;
 
 public abstract class AppDbContext(DbContextOptions options) : DbContext(options) {
-    public DbSet<PipelineStateEntity> PipelineState { get; set; } = null!;
-    public DbSet<SubscriptionEntity> Subscriptions { get; set; } = null!;
-    public DbSet<BackNavigationEntity> BackNavigations { get; set; } = null!;
-    public DbSet<PlayerEntity> Players { get; set; } = null!;
+    public DbSet<PipelineStateEntity> PipelineState { get; set; }
+    public DbSet<SubscriptionEntity> Subscriptions { get; set; }
+    public DbSet<BackNavigationEntity> BackNavigations { get; set; }
+    public DbSet<PlayerEntity> Players { get; set; }
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = default) {
