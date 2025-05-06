@@ -2,8 +2,6 @@ namespace SpinRallyBot.Events.UpdateReceivedConsumers;
 
 public class PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediator mediator)
     : IConsumer<UpdateReceived> {
-    private readonly IScopedMediator _mediator = mediator;
-
     public async Task Consume(ConsumeContext<UpdateReceived> context) {
         Update update = context.Message.Update;
         CancellationToken cancellationToken = context.CancellationToken;
@@ -22,7 +20,7 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediat
             return;
         }
 
-        Response<PipelineData, NoPipelineStateResult> result = await _mediator
+        Response<PipelineData, NoPipelineStateResult> result = await mediator
             .CreateRequestClient<GetPipelineData>()
             .GetResponse<PipelineData, NoPipelineStateResult>(new GetPipelineData(userId, chatId), cancellationToken);
 
@@ -39,10 +37,10 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediat
         args = args?.Append(messageText).ToArray() ?? [messageText];
 
         var navigationData = new NavigationData.PipelineData(pipeline, args);
-        await _mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "≡ Список", navigationData),
+        await mediator.Send(new PushBackNavigation(userId, chatId, Guid.NewGuid(), "≡ Список", navigationData),
             cancellationToken);
         try {
-            await _mediator.Publish(new CallbackReceived(
+            await mediator.Publish(new CallbackReceived(
                 navigationData,
                 null,
                 chatId,
@@ -51,7 +49,7 @@ public class PublishPipelineCallbackReceivedUpdateReceivedConsumer(IScopedMediat
                 context.Message.IsBotAdmin
             ), cancellationToken);
         } finally {
-            await _mediator.Send(new RemovePipelineState(userId, chatId), cancellationToken);
+            await mediator.Send(new RemovePipelineState(userId, chatId), cancellationToken);
         }
     }
 }

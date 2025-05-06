@@ -5,11 +5,9 @@ public record GetPipelineData(long UserId, long ChatId);
 public record NoPipelineStateResult;
 
 public class GetPipelineDataRequestConsumer(AppDbContext db) : IMediatorConsumer<GetPipelineData> {
-    private readonly AppDbContext _db = db;
-
     public async Task Consume(ConsumeContext<GetPipelineData> context) {
         CancellationToken cancellationToken = context.CancellationToken;
-        PipelineStateEntity? pipelineState = await _db.PipelineState.FindAsync([
+        PipelineStateEntity? pipelineState = await db.PipelineState.FindAsync([
             context.Message.UserId,
             context.Message.ChatId
         ], cancellationToken);

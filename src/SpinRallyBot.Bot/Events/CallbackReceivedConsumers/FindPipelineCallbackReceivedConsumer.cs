@@ -4,9 +4,6 @@ namespace SpinRallyBot.Events.CallbackReceivedConsumers;
 
 public class FindPipelineCallbackReceivedConsumer(IScopedMediator mediator, ITelegramBotClient botClient)
     : IMediatorConsumer<CallbackReceived> {
-    private readonly ITelegramBotClient _botClient = botClient;
-    private readonly IScopedMediator _mediator = mediator;
-
     public async Task Consume(ConsumeContext<CallbackReceived> context) {
         if (context.Message is not {
                 Data: NavigationData.PipelineData {
@@ -29,9 +26,9 @@ public class FindPipelineCallbackReceivedConsumer(IScopedMediator mediator, ITel
             case []:
                 //input player pipeline
                 CommandArgAttribute arg = Command.Find.GetAttributesOfType<CommandArgAttribute>()[0];
-                await _mediator.Send(new SetPipelineData(userId, chatId, new PipelineData(Pipeline.Find)),
+                await mediator.Send(new SetPipelineData(userId, chatId, new PipelineData(Pipeline.Find)),
                     cancellationToken);
-                await _botClient.SendMessage(
+                await botClient.SendMessage(
                     chatId,
                     arg.Name,
                     disableNotification: true,
@@ -41,7 +38,7 @@ public class FindPipelineCallbackReceivedConsumer(IScopedMediator mediator, ITel
                     }, cancellationToken: cancellationToken);
                 return;
             case [_]:
-                await _mediator.Publish(
+                await mediator.Publish(
                     new CommandReceived(
                         Command.Find,
                         args,

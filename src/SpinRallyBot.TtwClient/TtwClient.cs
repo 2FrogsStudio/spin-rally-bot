@@ -6,12 +6,9 @@ using AngleSharp.Html.Parser;
 namespace SpinRallyBot;
 
 public class TtwClient(HttpClient httpClient, IHtmlParser htmlParser) : ITtwClient {
-    private readonly IHtmlParser _htmlParser = htmlParser;
-    private readonly HttpClient _httpClient = httpClient;
-
     public async Task<PlayerInfo?> GetPlayerInfo(string playerUrl, CancellationToken cancellationToken) {
         var request = new HttpRequestMessage(HttpMethod.Get, playerUrl);
-        HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
+        HttpResponseMessage response = await httpClient.SendAsync(request, cancellationToken);
         if (response.StatusCode is HttpStatusCode.NotFound) {
             return null;
         }
@@ -19,7 +16,7 @@ public class TtwClient(HttpClient httpClient, IHtmlParser htmlParser) : ITtwClie
         response.EnsureSuccessStatusCode();
 
         IHtmlDocument doc =
-            await _htmlParser.ParseDocumentAsync(await response.Content.ReadAsStreamAsync(cancellationToken));
+            await htmlParser.ParseDocumentAsync(await response.Content.ReadAsStreamAsync(cancellationToken));
 
         string fio = doc.QuerySelector("div.player-page h1 span")?.Text() ?? throw new InvalidOperationException();
 
@@ -49,11 +46,11 @@ public class TtwClient(HttpClient httpClient, IHtmlParser htmlParser) : ITtwClie
             ])
         };
 
-        HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
+        HttpResponseMessage response = await httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         IHtmlDocument doc =
-            await _htmlParser.ParseDocumentAsync(await response.Content.ReadAsStreamAsync(cancellationToken));
+            await htmlParser.ParseDocumentAsync(await response.Content.ReadAsStreamAsync(cancellationToken));
 
         IHtmlCollection<IElement> htmlPlayers = doc.QuerySelectorAll("div a");
         return htmlPlayers.Select(h => new Player(
