@@ -34,7 +34,9 @@ public class AddSubscriptionConsumer(AppDbContext db, IScopedMediator mediator) 
             await _db.Subscriptions.FindAsync([chatId, playerUrl], cancellationToken)
             ?? new SubscriptionEntity {
                 ChatId = chatId,
-                PlayerUrl = player.PlayerUrl
+                PlayerUrl = player.PlayerUrl,
+                Player = await _db.Players.FindAsync([playerUrl], cancellationToken) ??
+                         throw new InvalidOperationException()
             };
 
         if (_db.Entry(entity).State is EntityState.Detached) {
