@@ -11,8 +11,8 @@ public class UriTryCreateTests {
             uri = new Uri(baseUri, uriString);
         }
 
-        uri.IsAbsoluteUri.Should().BeTrue();
-        uri.AbsolutePath.Should().Be("/players/");
-        uri.PathAndQuery.Should().Be("/players/?id=52a31ad");
+        uri.IsAbsoluteUri.ShouldBeTrue();
+        uri.AbsolutePath.ShouldBe("/players/");
+        uri.PathAndQuery.ShouldBe("/players/?id=52a31ad");
     }
 }

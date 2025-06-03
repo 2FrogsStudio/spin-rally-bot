@@ -17,5 +17,4 @@
     <ProjectReference Include="..\SpinRallyBot.Utils\SpinRallyBot.Utils.csproj" />
   </ItemGroup>
 
-
 </Project>

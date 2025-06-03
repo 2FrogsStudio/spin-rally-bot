@@ -10,11 +10,12 @@ public class CallbackDataSerializationTests {
         string json = JsonSerializer.Serialize(callbackData);
         var data = JsonSerializer.Deserialize<NavigationData>(json);
 
-        json.Length.Should().BeLessOrEqualTo(64);
-        data.Should().BeOfType<NavigationData.CommandData>()
-            .Which.Should().Match<NavigationData.CommandData>(f =>
-                f.Command == Command.Find
-                && f.Data == "/players/?id=52a31ad");
+        json.Length.ShouldBeLessThanOrEqualTo(64);
+        var commandData = data.ShouldBeOfType<NavigationData.CommandData>();
+        commandData.ShouldSatisfyAllConditions(
+            () => commandData.Command.ShouldBe(Command.Find),
+            () => commandData.Data.ShouldBe("/players/?id=52a31ad")
+        );
     }
 
     [Fact]
@@ -24,10 +25,11 @@ public class CallbackDataSerializationTests {
         string json = JsonSerializer.Serialize(navigationData);
         var data = JsonSerializer.Deserialize<NavigationData>(json);
 
-        json.Length.Should().BeLessOrEqualTo(64);
-        data.Should().BeOfType<NavigationData.CommandData>()
-            .Which.Should().Match<NavigationData.CommandData>(f =>
-                f.Command == Command.Find
-                && f.Data == "/players/?id=52a31ad");
+        json.Length.ShouldBeLessThanOrEqualTo(64);
+        var commandData = data.ShouldBeOfType<NavigationData.CommandData>();
+        commandData.ShouldSatisfyAllConditions(
+            () => commandData.Command.ShouldBe(Command.Find),
+            () => commandData.Data.ShouldBe("/players/?id=52a31ad")
+        );
     }
 }
