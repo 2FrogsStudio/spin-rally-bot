@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Shouldly" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="FluentAssertions" />
     <Using Include="Microsoft.Extensions.DependencyInjection" />
+    <Using Include="Shouldly" />
     <Using Include="Xunit" />
     <Using Include="Xunit.Abstractions" />
   </ItemGroup>
