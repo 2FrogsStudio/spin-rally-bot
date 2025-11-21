@@ -29,20 +29,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '9.0'
-
-      - name: Get Cache Month
-        id: cache-month
-        run: |
-          echo "date=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
-        shell: bash
-
-      - uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: nuget-${{ steps.cache-month.outputs.date }}-${{ hashFiles('src/Directory.Packages.props') }}
-          restore-keys: |
-            nuget-${{ steps.cache-month.outputs.date }}-
+          cache: true
 
       - name: Run tests
         timeout-minutes: 10
