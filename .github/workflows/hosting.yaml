@@ -1,0 +1,69 @@
+name: Hosting
+
+concurrency:
+  cancel-in-progress: true
+  group: production_deployment
+
+on:
+  push:
+    paths:
+      - .hosting/**
+      - .github/workflows/hosting.yaml
+    branches:
+      - main
+  workflow_run:
+    workflows: [ CI ]
+    types: [ completed ]
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  HOSTING_PATH: .hosting
+
+jobs:
+  run-app:
+    if: ${{ github.event.workflow_run == null || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+#    environment: production
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: ${{ env.HOSTING_PATH }}
+          sparse-checkout-cone-mode: false
+
+      - name: Create .env file
+        working-directory: ${{ env.HOSTING_PATH }}
+        run: |
+          cat <<EOT > .env
+          AMQP_URI=${{ secrets.AMQP_URI }}
+          Bot__AdminIds=${{ secrets.BOT_ADMIN_IDS }}
+          Bot__Token=${{ secrets.BOT_TOKEN }}
+          ConnectionStrings__Postgres=${{ secrets.POSTGRES_CONNECTION_STRING }}
+          SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          EOT
+
+      - name: Nx set SHAs
+        id: setSHAs
+        uses: nrwl/nx-set-shas@v4.4.0
+        with:
+          workflow-id: ci.yaml
+          set-environment-variables-for-job: false
+
+      - name: Deploy to Production server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          ARGS: "-rlgoDzvc -i"
+          SOURCE: "${{ env.HOSTING_PATH }}/"
+          REMOTE_HOST: ${{ vars.SSH_HOST }}
+          REMOTE_USER: ${{ vars.SSH_USER }}
+          TARGET: "${{ vars.TARGET_PATH }}/"
+          EXCLUDE: "/logs"
+          SCRIPT_BEFORE: |
+            ls -al "${{ vars.TARGET_PATH }}"
+          SCRIPT_AFTER: |
+            echo $RSYNC_STDOUT
+            cd "${{ vars.TARGET_PATH }}"
+            ls -al "${{ vars.TARGET_PATH }}"
+            TAG=${{ steps.setSHAs.outputs.base }} docker compose up --pull=always -d
+            docker image prune -a -f
