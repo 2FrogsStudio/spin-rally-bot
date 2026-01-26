@@ -6,6 +6,7 @@ services:
     env_file: .env
     volumes:
       - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
+      - ./logs:/app/logs
     restart: no
 
 volumes:
