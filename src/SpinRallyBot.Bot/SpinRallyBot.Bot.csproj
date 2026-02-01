@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit" VersionOverride="9.0.0" />
     <ProjectReference Include="..\SpinRallyBot.Abstract\SpinRallyBot.Abstract.csproj" />
     <ProjectReference Include="..\SpinRallyBot.Constants\SpinRallyBot.Constants.csproj" />
     <ProjectReference Include="..\SpinRallyBot.Database.Models\SpinRallyBot.Database.Models.csproj" />
