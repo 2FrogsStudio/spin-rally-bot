@@ -7,7 +7,7 @@ services:
     volumes:
       - /usr/share/zoneinfo:/usr/share/zoneinfo:ro
       - ./logs:/app/logs
-    restart: no
+    restart: on-failure
 
 volumes:
   Data:
